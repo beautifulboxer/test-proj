@@ -41,6 +41,20 @@
       2px 2px 0 #d4d4d4,
       4px 4px 8px rgba(0,0,0,0.2);
   }
+
+ <!-- NEW COMMON LOGIN PAGE -->
+<div id="mainLoginPage" class="page">
+  <h1>Login Portal</h1>
+
+  <button class="btn" onclick="showPage('studentLoginPage')">Student Login</button>
+  <button class="btn" onclick="showPage('adminLoginPage')">Admin Login</button>
+
+  <p style="margin-top:20px; font-size:16px;">Don't have an account?</p>
+  <button class="neon-btn" onclick="showPage('studentRegisterPage')">Sign Up</button>
+
+  <button class="back-btn" onclick="showPage('welcomePage')">↩</button>
+</div>
+
   /* Bottom arrow container */
 .bottom-arrow {
   position: absolute;
@@ -218,7 +232,8 @@
   
   
   <!-- Arrow button -->
-  <button class="arrow-btn" onclick="showPage('optionsPage')">➜</button>
+  <button class="arrow-btn" onclick="showPage('mainLoginPage')">➜</button>
+
 </div>
 
 <!-- OPTIONS PAGE -->
@@ -393,3 +408,4 @@ function adminLogin() {
 </body>
 
 </html>
+
