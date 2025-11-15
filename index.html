@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Hostel Management System</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; font-family:"Poppins",sans-serif; }
+
+  /* Light modern background for all pages except welcome */
+  body {
+    background: linear-gradient(135deg, #e8f0ff, #ffffff, #d9e9ff);
+    min-height:100vh;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    padding:20px;
+    flex-direction:column;
+  }
+
+ 
+  /* Dark overlay for readability */
+  #welcomePage::after {
+    content:"";
+    position:absolute;
+    top:0; left:0;
+    width:100%; height:100%;
+    background:rgba(0,0,0,0.45);
+    z-index:0;
+  }
+  #welcomePage * { position:relative; z-index:1; }
+
+  /* 3D heading */
+  h1 {
+    font-size: 42px;
+    color: #000;
+    font-weight: 800;
+    margin-bottom: 25px;
+    text-shadow: 
+      2px 2px 0 #d4d4d4,
+      4px 4px 8px rgba(0,0,0,0.2);
+  }
+  /* Bottom arrow container */
+.bottom-arrow {
+  position: absolute;
+  bottom: 30px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 2;
+}
+
+/* Arrow button same design */
+.bottom-arrow-btn {
+  width: 65px;
+  height: 65px;
+  border-radius: 50%;
+  border: none;
+  cursor: pointer;
+  font-size: 32px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:white;
+  color:#000;
+  box-shadow:0 5px 15px rgba(0,0,0,0.3);
+  transition:0.3s;
+}
+
+.bottom-arrow-btn:hover {
+  transform: translateX(-50%) translateY(-5px);
+}
+
+
+  /* Arrow Button */
+  .arrow-btn {
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+    border: none;
+    cursor: pointer;
+    font-size: 32px;
+    font-weight: 900;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    background:black;
+    color:#FFF;
+    box-shadow:0 5px 15px rgba(0,0,0,0.3);
+    transition:0.3s;
+  }
+  .arrow-btn:hover {
+    transform:translateY(-5px);
+    box-shadow:0 10px 20px rgba(0,0,0,0.4);
+  }
+
+  /* 3D buttons */
+  .btn {
+    padding: 12px 25px;
+    font-size: 16px;
+    font-weight: 600;
+    border-radius: 10px;
+    background: #ffffff;
+    border: 2px solid #bfc8ff;
+    color: #111;
+    cursor: pointer;
+    margin: 8px;
+    box-shadow: 
+      0 4px 0 #bfc8ff,
+      0 8px 15px rgba(0,0,0,0.1);
+    transition: 0.25s;
+  }
+
+  .btn:hover {
+    transform: translateY(-4px);
+    box-shadow: 
+      0 6px 0 #aab5ff,
+      0 10px 20px rgba(0,0,0,0.15);
+  }
+
+  .btn:active {
+    transform: translateY(2px);
+    box-shadow: 
+      0 2px 0 #8f9bff,
+      0 6px 12px rgba(0,0,0,0.1);
+  }
+
+  /* Input boxes */
+  .input-box {
+    width: 260px;
+    padding: 12px;
+    margin: 8px 0;
+    font-size: 16px;
+    border-radius: 8px;
+    border: 1.5px solid #a7b2ff;
+    color: #000;
+    background: #fff;
+    box-shadow: inset 0 2px 6px rgba(0,0,0,0.08);
+    transition: 0.3s;
+  }
+    /* Dark + Blur overlay for welcome page */
+#welcomePage::after {
+  content:"";
+  position:absolute;
+  top:0;
+  left:0;
+  width:100%;
+  height:100%;
+  background:url("https://images.adsttc.com/media/images/664c/e719/c1b8/0045/11c7/79b2/large_jpg/girls-college-and-hostel-for-model-education-trust-neogenesis-plus-studi0261_9.jpg")
+             no-repeat center center/cover;
+
+  filter: blur(2px);     /* ★ BLUR ADDED HERE */
+  transform: scale(1.05); /* Prevent blur edges */
+  z-index:0;
+}.back-btn {
+  padding: 10px 16px;
+  font-size: 22px;
+  border-radius: 10px;
+  background: #0a0a0a;
+  color: #fff;
+  border: 2px solid #6e7aff;
+  cursor: pointer;
+  transition: 0.3s;
+}
+.neon-btn {
+  padding: 12px 25px;
+  font-size: 18px;
+  font-weight: 600;
+  border-radius: 10px;
+  background: #0a0a0a;
+  color: #fff;
+  border: 2px solid #6e7aff;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.neon-btn:hover {
+  box-shadow: 0 0 15px #6e7aff, 0 0 25px #6e7aff;
+  color: #cdd3ff;
+}
+
+
+.back-btn:hover {
+  box-shadow: 0 0 15px #6e7aff, 0 0 25px #6e7aff;
+  color: #cdd3ff;
+}
+
+
+  .input-box:focus {
+    outline: none;
+    border-color: #6e7aff;
+    box-shadow: 0 0 8px rgba(110,122,255,0.4);
+  }
+
+  .page { display:none; flex-direction:column; align-items:center; animation:fadeIn 0.4s; }
+  #welcomePage { display:flex; }
+
+  .horizontal-btns {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  @keyframes fadeIn {
+    from {opacity:0; transform:translateY(10px);}
+    to {opacity:1; transform:translateY(0);}
+  }
+</style>
+</head>
+
+<body>
+
+<!-- WELCOME PAGE -->
+<div id="welcomePage" class="page">
+  <h1 style="color:white; text-shadow:2px 2px 10px black;">Hostel Management System</h1>
+  
+  
+  
+  <!-- Arrow button -->
+  <button class="arrow-btn" onclick="showPage('optionsPage')">➜</button>
+</div>
+
+<!-- OPTIONS PAGE -->
+<div id="optionsPage" class="page">
+  <h1>Select Portal</h1>
+  <div class="horizontal-btns">
+    <button class="btn" onclick="showPage('studentRegisterPage')">Student Portal</button>
+    <button class="btn" onclick="showPage('adminLoginPage')">Admin Portal</button>
+  </div>
+<button class="back-btn" onclick="showPage('welcomePage')">↩</button>
+
+</div>
+
+<!-- STUDENT REGISTER PAGE -->
+<div id="studentRegisterPage" class="page">
+  <h1>Student Registration</h1>
+  <input type="text" id="regName" class="input-box" placeholder="Enter Name">
+  <input type="text" id="regRoll" class="input-box" placeholder="Enter Roll No">
+
+  <!-- NEW Email field -->
+  <input type="email" id="regEmail" class="input-box" placeholder="Enter Email-ID">
+
+  <!-- ADDED MISSING COURSE INPUT -->
+  <input type="text" id="regCourse" class="input-box" placeholder="Enter Course">
+
+  <input type="password" id="regPass" class="input-box" placeholder="Set Password">
+
+  <button class="btn" onclick="registerStudent()">Register</button>
+
+  <button class="back-btn" onclick="showPage('optionsPage')">↩</button>
+
+</div>
+
+<!-- STUDENT LOGIN PAGE -->
+<div id="studentLoginPage" class="page">
+  <h1>Student Login</h1>
+  <input type="text" id="loginRoll" class="input-box" placeholder="Enter Roll No">
+  <input type="password" id="loginPass" class="input-box" placeholder="Enter Password">
+  <button class="btn" onclick="loginStudent()">Login</button>
+<button class="back-btn" onclick="showPage('optionsPage')">↩</button>
+
+</div>
+
+<!-- ADMIN LOGIN PAGE -->
+<div id="adminLoginPage" class="page">
+  <h1>Admin Login</h1>
+  <input id="adminUser" class="input-box" placeholder="Username">
+  <input id="adminPass" type="password" class="input-box" placeholder="Password">
+  <button class="btn" onclick="adminLogin()">Login</button>
+  <button class="back-btn" onclick="showPage('optionsPage')">↩</button>
+
+
+</div>
+
+<!-- ADMIN DASHBOARD PAGE -->
+<div id="adminDashboard" class="page">
+  <h1>Welcome Admin</h1>
+  <button class="btn">View Requests</button>
+  <button class="btn">See Reviews</button>
+  <button class="btn">Search Student</button>
+<button class="back-btn" onclick="showPage('optionsPage')">↩</button>
+
+</div>
+<!-- STUDENT DASHBOARD PAGE -->
+<div id="studentDashboardPage" class="page">
+  <h1>Welcome Student</h1>
+  <div class="horizontal-btns">
+    <button class="btn" onclick="showPage('hostelPage')">Hostel Form</button>
+    <button class="btn" onclick="showPage('reviewPage')">Submit Anonymous Review</button>
+  </div>
+  <button class="back-btn" onclick="showPage('optionsPage')">↩ </button>
+</div>
+
+<!-- HOSTEL PAGE (dummy placeholder) -->
+<div id="hostelPage" class="page">
+  <h1>Hostel Application</h1>
+  <p>Hostel application form goes here.</p>
+  <button class="back-btn" onclick="showPage('studentDashboardPage')">↩ </button>
+</div>
+
+<!-- ANONYMOUS REVIEW PAGE -->
+<div id="reviewPage" class="page">
+  <h1>Submit Anonymous Review</h1>
+  <textarea id="reviewText" class="input-box" placeholder="Write your review..." style="height:100px;"></textarea>
+  <button class="btn" onclick="submitReview()">Submit</button>
+  <button class="back-btn" onclick="showPage('studentDashboardPage')">↩ </button>
+</div>
+
+<script>
+let students = [];
+
+function showPage(id){
+  document.querySelectorAll('.page').forEach(p => p.style.display = 'none');
+  const el = document.getElementById(id);
+  if(el) el.style.display = 'flex';
+}
+
+// ensure welcome shown initially
+showPage('welcomePage');
+
+function registerStudent() {
+  const name = regName.value.trim();
+  const roll = regRoll.value.trim();
+  const email = regEmail.value.trim();
+  const course = regCourse.value.trim();
+  const pass = regPass.value.trim();
+
+  // VALIDATION START
+  if (!/^[A-Za-z ]+$/.test(name)) {
+    return alert("Please enter a valid name (letters only)");
+  }
+  if (!/^[0-9]+$/.test(roll)) {
+    return alert("Roll number must contain digits only");
+  }
+  if (!/^\S+@\S+\.\S+$/.test(email)) {
+    return alert("Please enter a valid email address");
+  }
+  if (course.length < 2) {
+    return alert("Please enter a valid course name");
+  }
+  if (!/^[0-9]{4}$/.test(pass)) {
+    return alert("Password must be exactly 4 digits only");
+  }
+
+  // REMOVE old entry if same roll exists (so student can re-register)
+  students = students.filter(s => s.roll !== roll);
+
+  // SAVE STUDENT
+  students.push({
+    name,
+    roll,
+    email,
+    course,
+    pass
+  });
+
+  alert("Registration successful!");
+  showPage("studentLoginPage");
+}
+
+
+
+function loginStudent() {
+  const roll = loginRoll.value.trim();
+  const pass = loginPass.value.trim();
+
+  const s = students.find(s => s.roll === roll && s.pass === pass);
+  if(!s) return alert("Invalid login");
+
+  alert("Welcome " + s.name);
+
+  // Show Student Dashboard page instead of alert only
+  showPage("studentDashboardPage");
+}
+function submitReview() {
+  const review = reviewText.value.trim();
+  if(review.length < 5) return alert("Please write a proper review (min 5 chars).");
+
+  alert("Thank you for your anonymous review!");
+  reviewText.value = "";  // clear textarea
+  showPage("studentDashboardPage");
+}
+
+
+function adminLogin() {
+  if(adminUser.value==="admin" && adminPass.value==="admin123")
+    showPage("adminDashboard");
+  else alert("Incorrect admin login");
+}
+</script>
+
+</body>
+</html>
