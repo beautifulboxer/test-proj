@@ -4,110 +4,127 @@
 <meta charset="UTF-8">
 <title>Hostel Management System</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
 <style>
-  * { margin:0; padding:0; box-sizing:border-box; font-family:"Poppins",sans-serif; }
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Poppins", sans-serif;
+  }
 
   body {
     background: linear-gradient(135deg, #e8f0ff, #ffffff, #d9e9ff);
-    min-height:100vh;
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    padding:20px;
-    flex-direction:column;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    flex-direction: column;
+  }
+
+  .page {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    animation: fadeIn 0.4s;
+    width: 100%;
+    max-width: 720px;
+  }
+
+  #welcomePage {
+    display: flex;
+    position: relative;
   }
 
   #welcomePage::after {
-    content:"";
-    position:absolute;
-    top:0;
-    left:0;
-    width:100%;
-    height:100%;
-    background:url("https://images.adsttc.com/media/images/664c/e719/c1b8/0045/11c7/79b2/large_jpg/girls-college-and-hostel-for-model-education-trust-neogenesis-plus-studi0261_9.jpg")
-               no-repeat center center/cover;
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: url("https://images.adsttc.com/media/images/664c/e719/c1b8/0045/11c7/79b2/large_jpg/girls-college-and-hostel-for-model-education-trust-neogenesis-plus-studi0261_9.jpg") no-repeat center center/cover;
     filter: blur(2px);
     transform: scale(1.05);
-    z-index:0;
+    z-index: 0;
   }
-  #welcomePage * { position:relative; z-index:1; }
+
+  #welcomePage * {
+    position: relative;
+    z-index: 1;
+  }
 
   h1 {
     font-size: 42px;
-    color: #000;
     font-weight: 800;
     margin-bottom: 25px;
-    text-shadow: 
-      2px 2px 0 #d4d4d4,
-      4px 4px 8px rgba(0,0,0,0.2);
+    color: #000;
+    text-shadow: 2px 2px 0 #d4d4d4, 4px 4px 8px rgba(0, 0, 0, 0.2);
+    text-align: center;
+  }
+
+  .arrow-btn,
+  .btn,
+  .neon-btn,
+  .back-btn {
+    cursor: pointer;
+    border: none;
+    border-radius: 10px;
+    transition: 0.3s;
   }
 
   .arrow-btn {
     width: 70px;
     height: 70px;
-    border-radius: 50%;
-    border: none;
-    cursor: pointer;
     font-size: 32px;
     font-weight: 900;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    background:black;
-    color:#FFF;
-    box-shadow:0 5px 15px rgba(0,0,0,0.3);
-    transition:0.3s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: black;
+    color: #fff;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    margin-top: 15px;
   }
 
   .arrow-btn:hover {
-    transform:translateY(-5px);
-    box-shadow:0 10px 20px rgba(0,0,0,0.4);
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.4);
   }
 
   .btn {
     padding: 12px 25px;
     font-size: 16px;
     font-weight: 600;
-    border-radius: 10px;
-    background: #ffffff;
+    background: #fff;
     border: 2px solid #bfc8ff;
     color: #111;
-    cursor: pointer;
     margin: 8px;
-    box-shadow: 
-      0 4px 0 #bfc8ff,
-      0 8px 15px rgba(0,0,0,0.1);
-    transition: 0.25s;
+    box-shadow: 0 4px 0 #bfc8ff, 0 8px 15px rgba(0, 0, 0, 0.1);
   }
 
   .btn:hover {
     transform: translateY(-4px);
-    box-shadow: 
-      0 6px 0 #aab5ff,
-      0 10px 20px rgba(0,0,0,0.15);
+    box-shadow: 0 6px 0 #aab5ff, 0 10px 20px rgba(0, 0, 0, 0.15);
   }
 
   .btn:active {
     transform: translateY(2px);
-    box-shadow: 
-      0 2px 0 #8f9bff,
-      0 6px 12px rgba(0,0,0,0.1);
+    box-shadow: 0 2px 0 #8f9bff, 0 6px 12px rgba(0, 0, 0, 0.1);
   }
 
-  .neon-btn, .back-btn {
+  .neon-btn,
+  .back-btn {
     padding: 12px 25px;
     font-size: 18px;
     font-weight: 600;
-    border-radius: 10px;
     background: #0a0a0a;
     color: #fff;
     border: 2px solid #6e7aff;
-    cursor: pointer;
-    transition: 0.3s;
   }
 
-  .neon-btn:hover, .back-btn:hover {
+  .neon-btn:hover,
+  .back-btn:hover {
     box-shadow: 0 0 15px #6e7aff, 0 0 25px #6e7aff;
     color: #cdd3ff;
   }
@@ -119,60 +136,98 @@
     font-size: 16px;
     border-radius: 8px;
     border: 1.5px solid #a7b2ff;
-    color: #000;
-    background: #fff;
-    box-shadow: inset 0 2px 6px rgba(0,0,0,0.08);
-    transition: 0.3s;
+    box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.08);
   }
 
   .input-box:focus {
     outline: none;
     border-color: #6e7aff;
-    box-shadow: 0 0 8px rgba(110,122,255,0.4);
+    box-shadow: 0 0 8px rgba(110, 122, 255, 0.4);
   }
-
-  .page { display:none; flex-direction:column; align-items:center; animation:fadeIn 0.4s; }
-  #welcomePage { display:flex; }
 
   .horizontal-btns {
     display: flex;
     gap: 20px;
     flex-wrap: wrap;
     justify-content: center;
+    margin-top: 15px;
+  }
+
+  .fee-table {
+    width: 90%;
+    max-width: 600px;
+    margin-top: 12px;
+  }
+
+  .fee-table table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  .fee-table th,
+  .fee-table td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: left;
+  }
+
+  .fee-table th {
+    background: #f2f4ff;
   }
 
   @keyframes fadeIn {
-    from {opacity:0; transform:translateY(10px);}
-    to {opacity:1; transform:translateY(0);}
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
   }
+
+  .request-card, .review-card, .student-detail-card {
+    background: #fff;
+    padding: 12px;
+    margin: 10px 0;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  }
+
+  .request-header, .student-detail-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .request-status {
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 6px;
+  }
+
+  .status-pending { background: orange; color: #fff; }
+  .status-approved { background: green; color: #fff; }
+  .status-rejected { background: red; color: #fff; }
 </style>
 </head>
-
 <body>
 
-<!-- WELCOME PAGE -->
 <div id="welcomePage" class="page">
   <h1 style="color:white; text-shadow:2px 2px 10px black;">Hostel Management System</h1>
   <button class="arrow-btn" onclick="showPage('mainLoginPage')">➜</button>
 </div>
 
-<!-- MAIN LOGIN PAGE -->
 <div id="mainLoginPage" class="page">
   <h1>Login Portal</h1>
-
-  <!-- REMOVED 2 BUTTONS -->
-  <input type="text" id="commonUser" class="input-box" placeholder="Enter Username / Roll No">
-  <input type="password" id="commonPass" class="input-box" placeholder="Enter Password">
-
-  <button class="btn" onclick="commonLogin()">Login</button>
-
-  <p style="margin-top:20px; font-size:16px;">Don't have an account?</p>
+  <input type="text" id="loginUser" class="input-box" placeholder="Enter Username / Roll No">
+  <input type="password" id="loginPass" class="input-box" placeholder="Enter Password">
+  <button class="btn" onclick="unifiedLogin()">Login</button>
+  <p style="margin-top:20px;">Don't have an account?</p>
   <button class="neon-btn" onclick="showPage('studentRegisterPage')">Sign Up</button>
-
   <button class="back-btn" onclick="showPage('welcomePage')">↩</button>
 </div>
 
-<!-- STUDENT REGISTER PAGE -->
 <div id="studentRegisterPage" class="page">
   <h1>Student Registration</h1>
   <input type="text" id="regName" class="input-box" placeholder="Enter Name">
@@ -180,106 +235,659 @@
   <input type="email" id="regEmail" class="input-box" placeholder="Enter Email-ID">
   <input type="text" id="regCourse" class="input-box" placeholder="Enter Course">
   <input type="password" id="regPass" class="input-box" placeholder="Set Password">
-
   <button class="btn" onclick="registerStudent()">Register</button>
   <button class="back-btn" onclick="showPage('mainLoginPage')">↩</button>
 </div>
 
-<!-- ADMIN DASHBOARD -->
-<div id="adminDashboard" class="page">
-  <h1>Welcome Admin</h1>
-  <button class="btn">View Requests</button>
-  <button class="btn">See Reviews</button>
-  <button class="btn">Search Student</button>
-  <button class="back-btn" onclick="showPage('mainLoginPage')">↩</button>
-</div>
-
-<!-- STUDENT DASHBOARD -->
 <div id="studentDashboardPage" class="page">
   <h1>Welcome Student</h1>
   <div class="horizontal-btns">
-    <button class="btn" onclick="showPage('hostelPage')">Hostel Form</button>
+    <button class="btn" onclick="showPage('hostelCategoryPage')">Hostel Form</button>
     <button class="btn" onclick="showPage('reviewPage')">Submit Anonymous Review</button>
+    <button class="btn" onclick="checkApplicationStatus()">Check Application Status</button>
   </div>
   <button class="back-btn" onclick="showPage('mainLoginPage')">↩</button>
 </div>
 
-<!-- HOSTEL PAGE -->
-<div id="hostelPage" class="page">
-  <h1>Hostel Application</h1>
-  <p>Hostel application form goes here.</p>
+<div id="hostelCategoryPage" class="page">
+  <h1>Select Hostel Category</h1>
+  <div class="horizontal-btns">
+    <button class="btn" onclick="openACPage('Boys')">Boys Hostel</button>
+    <button class="btn" onclick="openACPage('Girls')">Girls Hostel</button>
+  </div>
   <button class="back-btn" onclick="showPage('studentDashboardPage')">↩</button>
 </div>
 
-<!-- REVIEW PAGE -->
+<div id="hostelACPage" class="page">
+  <h1>Select Hostel</h1>
+  <div class="horizontal-btns">
+    <button class="btn" onclick="chooseACType('Hostel 1 AC')">Hostel 1 (AC) – ₹30,000</button>
+    <button class="btn" onclick="chooseACType('Hostel 2 Non-AC')">Hostel 2 (Non-AC) – ₹20,000</button>
+  </div>
+  <button class="back-btn" onclick="showPage('hostelCategoryPage')">↩</button>
+</div>
+
+<div id="hostelFormPage" class="page">
+  <h1 id="hostelFormTitle">Hostel Application</h1>
+
+  <label style="margin-top:12px;">Washroom:</label>
+  <select id="hf_washroom" class="input-box">
+    <option value="Attached">Attached - ₹15000</option>
+    <option value="Common">Common - ₹10000</option>
+  </select>
+
+  <label>Occupancy:</label>
+  <select id="hf_occupancy" class="input-box">
+    <option value="Single">Single - ₹7000</option>
+    <option value="Double">Double - ₹5000</option>
+    <option value="Triple">Triple - ₹4000</option>
+    <option value="Quad">Quad - ₹4000</option>
+  </select>
+
+  <label>Mess:</label>
+  <select id="hf_mess" class="input-box">
+    <option value="Veg">Veg - ₹10000</option>
+    <option value="NonVeg">Veg + Non-Veg - ₹20000</option>
+  </select>
+
+  <label>Extras:</label>
+  <div style="width:260px; text-align:left; margin:8px 0;">
+    <label><input type="checkbox" id="hf_gym"> Gym (₹1000)</label><br>
+    <label><input type="checkbox" id="hf_library"> Library (₹500)</label><br>
+    <label><input type="checkbox" id="hf_cleaner"> Room Cleaner (₹700)</label>
+  </div>
+
+  <div id="hf_feeTable" class="fee-table"></div>
+
+  <div style="display:flex; gap:10px; margin-top:12px;">
+    <button class="btn" onclick="calculateHostelFees()">Calculate & Preview</button>
+    <button class="back-btn" onclick="showPage('hostelACPage')">↩ Back</button>
+  </div>
+
+  <div style="margin-top:12px; display:flex; gap:10px;">
+    <button class="btn" onclick="submitHostelApplication()">Submit Application</button>
+    <button class="back-btn" onclick="showPage('studentDashboardPage')">Cancel</button>
+  </div>
+</div>
+
 <div id="reviewPage" class="page">
   <h1>Submit Anonymous Review</h1>
-  <textarea id="reviewText" class="input-box" placeholder="Write your review..." style="height:100px;"></textarea>
+
+  <label>Mess:</label>
+  <select id="rev_mess" class="input-box">
+    <option value="select" selected>select</option>
+    <option value="1">1</option>
+    <option value="2">2</option>
+    <option value="3">3</option>
+    <option value="4">4</option>
+    <option value="5">5</option>
+  </select>
+
+  <label>Laundry:</label>
+  <select id="rev_laundry" class="input-box">
+    <option value="select" selected>select</option>
+    <option value="1">1</option>
+    <option value="2">2</option>
+    <option value="3">3</option>
+    <option value="4">4</option>
+    <option value="5">5</option>
+  </select>
+
+  <label>Gym:</label>
+  <select id="rev_gym" class="input-box">
+    <option value="select" selected>select</option>
+    <option value="1">1</option>
+    <option value="2">2</option>
+    <option value="3">3</option>
+    <option value="4">4</option>
+    <option value="5">5</option>
+  </select>
+
+  <label>WiFi:</label>
+  <select id="rev_wifi" class="input-box">
+    <option value="select" selected>select</option>
+    <option value="1">1</option>
+    <option value="2">2</option>
+    <option value="3">3</option>
+    <option value="4">4</option>
+    <option value="5">5</option>
+  </select>
+
+  <label>Playground:</label>
+  <select id="rev_playground" class="input-box">
+    <option value="select" selected>select</option>
+    <option value="1">1</option>
+    <option value="2">2</option>
+    <option value="3">3</option>
+    <option value="4">4</option>
+    <option value="5">5</option>
+  </select>
+
+  <label>Cleanliness:</label>
+  <select id="rev_cleanliness" class="input-box">
+    <option value="select" selected>select</option>
+    <option value="1">1</option>
+    <option value="2">2</option>
+    <option value="3">3</option>
+    <option value="4">4</option>
+    <option value="5">5</option>
+  </select>
+
+  <label>Hostel Maintenance:</label>
+  <select id="rev_maintenance" class="input-box">
+    <option value="select" selected>select</option>
+    <option value="1">1</option>
+    <option value="2">2</option>
+    <option value="3">3</option>
+    <option value="4">4</option>
+    <option value="5">5</option>
+  </select>
+
+  <label>Comments / Suggestions:</label>
+  <textarea id="rev_comments" class="input-box" placeholder="Write your comments or suggestions..." style="height:100px;"></textarea>
+
   <button class="btn" onclick="submitReview()">Submit</button>
   <button class="back-btn" onclick="showPage('studentDashboardPage')">↩</button>
 </div>
 
-<script>
-let students = [];
+<div id="applicationStatusPage" class="page">
+  <h1>Your Application Status</h1>
+  <div id="statusContainer" style="width:90%; max-width:700px;"></div>
+  <button class="back-btn" onclick="showPage('studentDashboardPage')">↩</button>
+</div>
 
-function showPage(id){
-  document.querySelectorAll('.page').forEach(p => p.style.display = 'none');
-  document.getElementById(id).style.display = 'flex';
+<div id="adminDashboard" class="page">
+  <h1>Welcome Admin</h1>
+  <button class="btn" onclick="viewAllRequests()">View Requests</button>
+  <button class="btn" onclick="viewAllReviews()">See Reviews</button>
+  <button class="btn" onclick="loadStudents()">View Students</button>
+  <button class="back-btn" onclick="showPage('mainLoginPage')">↩</button>
+</div>
+
+<div id="adminRequestsPage" class="page">
+  <h1>All Requests</h1>
+  <div id="adminRequestsContainer" style="width:90%; max-width:700px;"></div>
+  <button class="back-btn" onclick="showPage('adminDashboard')">↩</button>
+</div>
+
+<div id="adminReviewsPage" class="page">
+  <h1>Student Reviews</h1>
+  <div id="adminReviewsContainer" style="width:90%; max-width:700px;"></div>
+  <button class="back-btn" onclick="showPage('adminDashboard')">↩</button>
+</div>
+
+<div id="adminStudentDetails" class="page">
+  <h1>All Students</h1>
+  <input type="text" id="searchStudent" class="input-box" placeholder="Search Students..." oninput="filterStudents()">
+  <table style="width:90%; max-width:700px; border-collapse: collapse; margin-top:12px;">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Roll No</th>
+        <th>Email</th>
+        <th>Course</th>
+        <th>Amenities Chosen</th>
+      </tr>
+    </thead>
+    <tbody id="studentTableBody"></tbody>
+  </table>
+  <button class="back-btn" onclick="showPage('adminDashboard')">↩</button>
+</div>
+
+<script>
+let selectedCategory = ""; 
+let selectedHostel = "";
+let calculatedFee = 0;
+
+function showPage(pageId) {
+    document.querySelectorAll(".page").forEach(p => p.style.display = "none");
+    document.getElementById(pageId).style.display = "flex";
 }
 
-showPage('welcomePage');
+const STUDENTS_KEY = "hms_students";
+const REVIEWS_KEY = "HOSTEL_REVIEWS";
+const APPLICATIONS_KEY = "HOSTEL_APPLICATIONS";
 
 function registerStudent() {
-  const name = regName.value.trim();
-  const roll = regRoll.value.trim();
-  const email = regEmail.value.trim();
-  const course = regCourse.value.trim();
-  const pass = regPass.value.trim();
+    let name = regName.value.trim();
+    let roll = regRoll.value.trim();
+    let email = regEmail.value.trim();
+    let course = regCourse.value.trim();
+    let pass = regPass.value.trim();
 
-  if (!/^[A-Za-z ]+$/.test(name)) return alert("Please enter a valid name");
-  if (!/^[0-9]+$/.test(roll)) return alert("Roll number must be digits only");
-  if (!/^\S+@\S+\.\S+$/.test(email)) return alert("Enter a valid email");
-  if (course.length < 2) return alert("Enter a valid course");
-  if (!/^[0-9]{4}$/.test(pass)) return alert("Password must be 4 digits");
+    if (!name || !roll || !email || !course || !pass) {
+        alert("Please fill all fields!");
+        return;
+    }
 
-  students = students.filter(s => s.roll !== roll);
+    let students = JSON.parse(localStorage.getItem(STUDENTS_KEY)) || [];
+    students.push({ name, roll, email, course, pass });
+    localStorage.setItem(STUDENTS_KEY, JSON.stringify(students));
 
-  students.push({ name, roll, email, course, pass });
-
-  alert("Registration successful!");
-  showPage("mainLoginPage");
+    alert("Registration successful!");
+    showPage("mainLoginPage");
 }
 
-function commonLogin() {
-  const user = commonUser.value.trim();
-  const pass = commonPass.value.trim();
+function unifiedLogin() {
+    let username = loginUser.value.trim();
+    let password = loginPass.value.trim();
 
-  // ADMIN LOGIN
-  if (user === "admin" && pass === "admin123") {
-    alert("Admin Logged In");
-    return showPage("adminDashboard");
-  }
+    if (!username || !password) {
+        alert("Enter username and password!");
+        return;
+    }
 
-  // STUDENT LOGIN
-  const s = students.find(st => st.roll === user && st.pass === pass);
+    if (username === "admin" && password === "admin123") {
+        showPage("adminDashboard");
+        return;
+    }
 
-  if (!s) {
-    return alert("No student found. Please Sign Up first.");
-  }
+    let students = JSON.parse(localStorage.getItem(STUDENTS_KEY)) || [];
+    let student = students.find(s => s.roll === username && s.pass === password);
 
-  alert("Welcome " + s.name);
-  showPage("studentDashboardPage");
+    if (student) {
+        sessionStorage.setItem("loggedInStudent", JSON.stringify(student));
+        showPage("studentDashboardPage");
+    } else {
+        alert("Invalid Credentials!");
+    }
+}
+
+function openACPage(category) {
+    selectedCategory = category;
+    showPage("hostelACPage");
+}
+
+function chooseACType(hostelName) {
+    selectedHostel = hostelName;
+    showPage("hostelFormPage");
+}
+
+function calculateHostelFees() {
+    let washroom = hf_washroom.value;
+    let occupancy = hf_occupancy.value;
+    let mess = hf_mess.value;
+    let gym = hf_gym.checked;
+    let library = hf_library.checked;
+    let cleaner = hf_cleaner.checked;
+
+    let fee = 0;
+    fee += selectedHostel.includes("AC") ? 30000 : 20000;
+    fee += washroom === "Attached" ? 15000 : 10000;
+    
+    const occ = { Single: 7000, Double: 5000, Triple: 4000, Quad: 4000 };
+    fee += occ[occupancy];
+    fee += mess === "Veg" ? 10000 : 20000;
+    
+    if (gym) fee += 1000;
+    if (library) fee += 500;
+    if (cleaner) fee += 700;
+
+    calculatedFee = fee;
+
+    hf_feeTable.innerHTML = `
+        <table>
+            <tr><th>Category</th><th>Selected</th><th>Fee</th></tr>
+            <tr><td>Hostel</td><td>${selectedHostel}</td><td>₹${selectedHostel.includes("AC")?30000:20000}</td></tr>
+            <tr><td>Washroom</td><td>${washroom}</td><td>₹${washroom==="Attached"?15000:10000}</td></tr>
+            <tr><td>Occupancy</td><td>${occupancy}</td><td>₹${occ[occupancy]}</td></tr>
+            <tr><td>Mess</td><td>${mess}</td><td>₹${mess==="Veg"?10000:20000}</td></tr>
+            <tr><td>Gym</td><td>${gym?"Yes":"No"}</td><td>₹${gym?1000:0}</td></tr>
+            <tr><td>Library</td><td>${library?"Yes":"No"}</td><td>₹${library?500:0}</td></tr>
+            <tr><td>Cleaner</td><td>${cleaner?"Yes":"No"}</td><td>₹${cleaner?700:0}</td></tr>
+            <tr><th>Total</th><td></td><th>₹${fee}</th></tr>
+        </table>
+    `;
+}
+
+function submitHostelApplication() {
+    const student = JSON.parse(sessionStorage.getItem("loggedInStudent"));
+
+    if (!student) {
+        alert("You must log in first!");
+        return;
+    }
+
+    if (calculatedFee === 0) {
+        alert("Please calculate fees first!");
+        return;
+    }
+
+    const washroom = hf_washroom.value;
+    const occupancy = hf_occupancy.value;
+    const mess = hf_mess.value;
+    const gym = hf_gym.checked;
+    const library = hf_library.checked;
+    const cleaner = hf_cleaner.checked;
+
+    let apps = JSON.parse(localStorage.getItem(APPLICATIONS_KEY)) || [];
+
+    const alreadyApplied = apps.some(app => app.roll === student.roll);
+    if (alreadyApplied) {
+        alert("You already submitted a hostel request!");
+        return;
+    }
+
+    const newApp = {
+        name: student.name,
+        roll: student.roll,
+        hostel: selectedHostel,
+        category: selectedCategory,
+        washroom: washroom,
+        occupancy: occupancy,
+        mess: mess,
+        gym: gym,
+        library: library,
+        cleaner: cleaner,
+        fee: calculatedFee,
+        status: "Pending",
+        date: new Date().toLocaleString()
+    };
+
+    apps.push(newApp);
+    localStorage.setItem(APPLICATIONS_KEY, JSON.stringify(apps));
+
+    alert("Hostel Request Submitted Successfully!");
+    
+    calculatedFee = 0;
+    hf_feeTable.innerHTML = "";
+    
+    showPage("studentDashboardPage");
+}
+
+function checkApplicationStatus() {
+    const student = JSON.parse(sessionStorage.getItem("loggedInStudent"));
+    let apps = JSON.parse(localStorage.getItem(APPLICATIONS_KEY)) || [];
+    let list = apps.filter(a => a.roll === student.roll);
+
+    if (list.length === 0) {
+        statusContainer.innerHTML = "<p>No applications submitted yet.</p>";
+    } else {
+        statusContainer.innerHTML = list.map(a => `
+            <div class="request-card">
+                <p><b>Category:</b> ${a.category}</p>
+                <p><b>Hostel:</b> ${a.hostel}</p>
+                <p><b>Washroom:</b> ${a.washroom}</p>
+                <p><b>Occupancy:</b> ${a.occupancy}</p>
+                <p><b>Mess:</b> ${a.mess}</p>
+                <p><b>Extras:</b> ${[a.gym && 'Gym', a.library && 'Library', a.cleaner && 'Cleaner'].filter(Boolean).join(', ') || 'None'}</p>
+                <p><b>Fee:</b> ₹${a.fee}</p>
+                <p><b>Date:</b> ${a.date}</p>
+                <p><b>Status:</b> 
+                    <span class="request-status ${a.status === "Pending" ? "status-pending" : a.status === "Approved" ? "status-approved" : "status-rejected"}">
+                        ${a.status}
+                    </span>
+                </p>
+            </div>
+        `).join("");
+    }
+
+    showPage("applicationStatusPage");
 }
 
 function submitReview() {
-  const review = reviewText.value.trim();
-  if(review.length < 5) return alert("Please write a proper review");
+    const student = JSON.parse(sessionStorage.getItem("loggedInStudent"));
 
-  alert("Thank you for your review!");
-  reviewText.value = "";
-  showPage("studentDashboardPage");
+    if (!student) {
+        alert("You must log in first!");
+        return;
+    }
+
+    const cleanliness = rev_cleanliness.value;
+    const mess = rev_mess.value;
+    const laundry = rev_laundry.value;
+    const gym = rev_gym.value;
+    const wifi = rev_wifi.value;
+    const playground = rev_playground.value;
+    const maintenance = rev_maintenance.value;
+    const comments = rev_comments.value.trim();
+
+    if (cleanliness === "select" || mess === "select" || laundry === "select" || 
+        gym === "select" || wifi === "select" || playground === "select" || maintenance === "select") {
+        alert("Please select all ratings!");
+        return;
+    }
+
+    let reviews = JSON.parse(localStorage.getItem(REVIEWS_KEY)) || [];
+
+    const newReview = {
+        cleanliness,
+        mess,
+        laundry,
+        gym,
+        wifi,
+        playground,
+        maintenance,
+        comments,
+        date: new Date().toLocaleString()
+    };
+
+    reviews.push(newReview);
+    localStorage.setItem(REVIEWS_KEY, JSON.stringify(reviews));
+
+    alert("Review submitted successfully!");
+    showPage("studentDashboardPage");
 }
-</script>
 
+function viewAllRequests() {
+    let apps = JSON.parse(localStorage.getItem(APPLICATIONS_KEY)) || [];
+
+    if (apps.length === 0) {
+        adminRequestsContainer.innerHTML = "<p>No requests yet.</p>";
+    } else {
+        adminRequestsContainer.innerHTML = apps.map((a, index) => `
+            <div class="request-card">
+                <div class="request-header">
+                    <p><b>${a.name} (${a.roll})</b></p>
+                    <span class="request-status ${a.status === "Pending" ? "status-pending" : a.status === "Approved" ? "status-approved" : "status-rejected"}">
+                        ${a.status}
+                    </span>
+                </div>
+                <p><b>Category:</b> ${a.category}</p>
+                <p><b>Hostel:</b> ${a.hostel}</p>
+                <p><b>Washroom:</b> ${a.washroom}</p>
+                <p><b>Occupancy:</b> ${a.occupancy}</p>
+                <p><b>Mess:</b> ${a.mess}</p>
+                <p><b>Extras:</b> ${[a.gym && 'Gym', a.library && 'Library', a.cleaner && 'Cleaner'].filter(Boolean).join(', ') || 'None'}</p>
+                <p><b>Fee:</b> ₹${a.fee}</p>
+                <p><b>Date:</b> ${a.date}</p>
+                <button onclick="updateStatus(${index}, 'Approved')" class="btn">Approve</button>
+                <button onclick="updateStatus(${index}, 'Rejected')" class="btn">Reject</button>
+            </div>
+        `).join("");
+    }
+
+    showPage("adminRequestsPage");
+}
+
+function updateStatus(i, status) {
+    let apps = JSON.parse(localStorage.getItem(APPLICATIONS_KEY)) || [];
+    apps[i].status = status;
+    localStorage.setItem(APPLICATIONS_KEY, JSON.stringify(apps));
+    viewAllRequests();
+}
+
+function viewAllReviews() {
+    let all = JSON.parse(localStorage.getItem(REVIEWS_KEY)) || [];
+
+    if (all.length === 0) {
+        adminReviewsContainer.innerHTML = "<p>No reviews yet.</p>";
+    } else {
+        adminReviewsContainer.innerHTML = all.map((r, index) => {
+            const avg = ((+r.mess + +r.laundry + +r.gym + +r.wifi + +r.playground + +r.cleanliness + +r.maintenance) / 7).toFixed(1);
+            return `
+                <div class="review-card">
+                    <p><b>Review #${index + 1}</b> - ${r.date}</p>
+                    <p><b>Ratings:</b></p>
+                    <p>Mess: ${r.mess}/5 | Laundry: ${r.laundry}/5 | Gym: ${r.gym}/5</p>
+                    <p>WiFi: ${r.wifi}/5 | Playground: ${r.playground}/5</p>
+                    <p>Cleanliness: ${r.cleanliness}/5 | Maintenance: ${r.maintenance}/5</p>
+                    <p><b>Average Rating:</b> ${avg}/5</p>
+                    <p><b>Comments:</b> ${r.comments || "No comments"}</p>
+                </div>
+            `;
+        }).join("");
+    }
+
+    showPage("adminReviewsPage");
+}
+
+function loadStudents() {
+    let students = JSON.parse(localStorage.getItem(STUDENTS_KEY)) || [];
+    let apps = JSON.parse(localStorage.getItem(APPLICATIONS_KEY)) || [];
+    let tbody = document.getElementById("studentTableBody");
+    
+    if (students.length === 0) {
+        tbody.innerHTML = "<tr><td colspan='5'>No students registered yet.</td></tr>";
+    } else {
+        tbody.innerHTML = students.map(s => {
+            const studentApp = apps.find(app => app.roll === s.roll);
+            const amenities = studentApp ? 
+                `Hostel: ${studentApp.hostel}<br>
+                 Washroom: ${studentApp.washroom}<br>
+                 Occupancy: ${studentApp.occupancy}<br>
+                 Mess: ${studentApp.mess}<br>
+                 Extras: ${[
+                     studentApp.gym && 'Gym', 
+                     studentApp.library && 'Library', 
+                     studentApp.cleaner && 'Cleaner'
+                 ].filter(Boolean).join(', ') || 'None'}` 
+                : 'No application submitted';
+            
+            return `
+                <tr>
+                    <td>${s.name}</td>
+                    <td>${s.roll}</td>
+                    <td>${s.email}</td>
+                    <td>${s.course}</td>
+                    <td style="text-align: left; font-size: 12px;">${amenities}</td>
+                </tr>
+            `;
+        }).join("");
+    }
+    
+    showPage("adminStudentDetails");
+}
+
+function filterStudents() {
+    let search = document.getElementById("searchStudent").value.toLowerCase();
+    let students = JSON.parse(localStorage.getItem(STUDENTS_KEY)) || [];
+    let apps = JSON.parse(localStorage.getItem(APPLICATIONS_KEY)) || [];
+    let tbody = document.getElementById("studentTableBody");
+    
+    let filtered = students.filter(s => 
+        s.name.toLowerCase().includes(search) || 
+        s.roll.toLowerCase().includes(search) ||
+        s.email.toLowerCase().includes(search) ||
+        s.course.toLowerCase().includes(search)
+    );
+    
+    if (filtered.length === 0) {
+        tbody.innerHTML = "<tr><td colspan='5'>No matching students found.</td></tr>";
+    } else {
+        tbody.innerHTML = filtered.map(s => {
+            const studentApp = apps.find(app => app.roll === s.roll);
+            const amenities = studentApp ? 
+                `Hostel: ${studentApp.hostel}<br>
+                 Washroom: ${studentApp.washroom}<br>
+                 Occupancy: ${studentApp.occupancy}<br>
+                 Mess: ${studentApp.mess}<br>
+                 Extras: ${[
+                     studentApp.gym && 'Gym', 
+                     studentApp.library && 'Library', 
+                     studentApp.cleaner && 'Cleaner'
+                 ].filter(Boolean).join(', ') || 'None'}` 
+                : 'No application submitted';
+            
+            return `
+                <tr>
+                    <td>${s.name}</td>
+                    <td>${s.roll}</td>
+                    <td>${s.email}</td>
+                    <td>${s.course}</td>
+                    <td style="text-align: left; font-size: 12px;">${amenities}</td>
+                </tr>
+            `;
+        }).join("");
+    }
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    if (!localStorage.getItem(STUDENTS_KEY)) {
+        localStorage.setItem(STUDENTS_KEY, JSON.stringify([]));
+    }
+    if (!localStorage.getItem(REVIEWS_KEY)) {
+        localStorage.setItem(REVIEWS_KEY, JSON.stringify([]));
+    }
+    if (!localStorage.getItem(APPLICATIONS_KEY)) {
+        localStorage.setItem(APPLICATIONS_KEY, JSON.stringify([]));
+    }
+    
+    showPage('welcomePage');
+});
+
+function addSampleData() {
+    const sampleStudents = [
+        {
+            name: "John Doe",
+            roll: "2023001",
+            email: "john.doe@college.edu",
+            course: "Computer Science",
+            pass: "password123"
+        },
+        {
+            name: "Jane Smith",
+            roll: "2023002", 
+            email: "jane.smith@college.edu",
+            course: "Electrical Engineering",
+            pass: "password123"
+        }
+    ];
+    
+    const sampleApplications = [
+        {
+            name: "John Doe",
+            roll: "2023001",
+            hostel: "Hostel 1 AC",
+            category: "Boys",
+            washroom: "Attached",
+            occupancy: "Single",
+            mess: "Veg",
+            gym: true,
+            library: true,
+            cleaner: false,
+            fee: 66500,
+            status: "Approved",
+            date: new Date().toLocaleString()
+        }
+    ];
+    
+    const sampleReviews = [
+        {
+            cleanliness: "4",
+            mess: "3",
+            laundry: "4",
+            gym: "5",
+            wifi: "2",
+            playground: "4",
+            maintenance: "3",
+            comments: "WiFi needs improvement, otherwise good facilities.",
+            date: new Date().toLocaleString()
+        }
+    ];
+    
+    if (JSON.parse(localStorage.getItem(STUDENTS_KEY)).length === 0) {
+        localStorage.setItem(STUDENTS_KEY, JSON.stringify(sampleStudents));
+    }
+    if (JSON.parse(localStorage.getItem(APPLICATIONS_KEY)).length === 0) {
+        localStorage.setItem(APPLICATIONS_KEY, JSON.stringify(sampleApplications));
+    }
+    if (JSON.parse(localStorage.getItem(REVIEWS_KEY)).length === 0) {
+        localStorage.setItem(REVIEWS_KEY, JSON.stringify(sampleReviews));
+    }
+}
+
+addSampleData();
+</script>
 </body>
 </html>
