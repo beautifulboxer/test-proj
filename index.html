@@ -20,7 +20,6 @@ html, body {
   overflow-x: hidden;
 }
 
-/* Remove all body styling that interferes with welcome page */
 body {
   margin: 0;
   padding: 0;
@@ -34,47 +33,35 @@ body {
   align-items: center;
   justify-content: center;
   animation: fadeIn 0.4s;
-
   width: 100%;
-  height: 100vh;  /* FULL PAGE */
+  height: 100vh;
   padding: 20px;
-
   background: linear-gradient(135deg, #e8f0ff, #ffffff, #d9e9ff);
 }
 
-
+#welcomePage {
+  position: relative;
+  overflow: hidden;
+}
 
 #welcomePage::after {
-    content:"";
-    position:absolute;
-    top:0;
-    left:0;
-    width:100%;
-    height:100%;
-    background:url("https://images.adsttc.com/media/images/664c/e719/c1b8/0045/11c7/79b2/large_jpg/girls-college-and-hostel-for-model-education-trust-neogenesis-plus-studi0261_9.jpg")
-               no-repeat center center/cover;
-    filter: blur(2px);
-    transform: scale(1.05);
-    z-index:0;
-  }
-  #welcomePage * { position:relative; z-index:1; }
-
-  h1 {
-    font-size: 42px;
-    color: #000;
-    font-weight: 800;
-    margin-bottom: 25px;
-    text-shadow: 
-      2px 2px 0 #d4d4d4,
-      4px 4px 8px rgba(0,0,0,0.2);
-  }
-
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: url("https://images.adsttc.com/media/images/664c/e719/c1b8/0045/11c7/79b2/large_jpg/girls-college-and-hostel-for-model-education-trust-neogenesis-plus-studi0261_9.jpg")
+              no-repeat center center/cover;
+  filter: blur(2px);
+  transform: scale(1.05);
+  z-index: 0;
+}
 
 #welcomePage * {
   position: relative;
   z-index: 1;
 }
-
 
 h1 {
   font-size: 42px;
@@ -83,6 +70,11 @@ h1 {
   color: #000;
   text-shadow: 2px 2px 0 #d4d4d4, 4px 4px 8px rgba(0, 0, 0, 0.2);
   text-align: center;
+}
+
+#welcomePage h1 {
+  color: white;
+  text-shadow: 2px 2px 10px black;
 }
 
 .arrow-btn,
@@ -231,23 +223,35 @@ h1 {
 .status-pending { background: orange; color: #fff; }
 .status-approved { background: green; color: #fff; }
 .status-rejected { background: red; color: #fff; }
+
+.danger-btn {
+  background: red;
+  color: white;
+  padding: 12px 25px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: 600;
+  margin: 8px;
+}
 </style>
 </head>
 <body>
 
 <div id="welcomePage" class="page">
-  <h1 style="color:white; text-shadow:2px 2px 10px black;">Hostel Management System</h1>
+  <h1>Hostel Management System</h1>
   <button class="arrow-btn" onclick="showPage('mainLoginPage')">➜</button>
 </div>
 
 <div id="mainLoginPage" class="page">
   <h1>Login Portal</h1>
   <input type="text" id="loginUser" class="input-box" placeholder="Enter Username / Roll No">
-<input type="password" id="loginPass" class="input-box" placeholder="Enter Password">
+  <input type="password" id="loginPass" class="input-box" placeholder="Enter Password">
   <button class="btn" onclick="unifiedLogin()">Login</button>
   <p style="margin-top:20px;">Don't have an account?</p>
   <button class="neon-btn" onclick="showPage('studentRegisterPage')">Sign Up</button>
-  <button class="back-btn" onclick="showPage('welcomePage')">↩</button>
+  <button class="back-btn" onclick="clearLoginForm(); showPage('welcomePage')">↩</button>
 </div>
 
 <div id="studentRegisterPage" class="page">
@@ -256,9 +260,9 @@ h1 {
   <input type="text" id="regRoll" class="input-box" placeholder="Enter Roll No">
   <input type="email" id="regEmail" class="input-box" placeholder="Enter Email-ID">
   <input type="text" id="regCourse" class="input-box" placeholder="Enter Course">
-<input type="text" id="regPass" class="input-box" placeholder="Set Password">
+  <input type="password" id="regPass" class="input-box" placeholder="Set Password">
   <button class="btn" onclick="registerStudent()">Register</button>
-  <button class="back-btn" onclick="showPage('mainLoginPage')">↩</button>
+  <button class="back-btn" onclick="clearRegistrationForm(); showPage('mainLoginPage')">↩</button>
 </div>
 
 <div id="studentDashboardPage" class="page">
@@ -268,7 +272,7 @@ h1 {
     <button class="btn" onclick="showPage('reviewPage')">Submit Anonymous Review</button>
     <button class="btn" onclick="checkApplicationStatus()">Check Application Status</button>
   </div>
-  <button class="back-btn" onclick="showPage('mainLoginPage')">↩</button>
+  <button class="back-btn" onclick="logout()">↩ Logout</button>
 </div>
 
 <div id="hostelCategoryPage" class="page">
@@ -328,7 +332,7 @@ h1 {
 
   <div style="margin-top:12px; display:flex; gap:10px;">
     <button class="btn" onclick="submitHostelApplication()">Submit Application</button>
-    <button class="back-btn" onclick="showPage('studentDashboardPage')">Cancel</button>
+    <button class="back-btn" onclick="clearHostelForm(); showPage('studentDashboardPage')">Cancel</button>
   </div>
 </div>
 
@@ -409,7 +413,7 @@ h1 {
   <textarea id="rev_comments" class="input-box" placeholder="Write your comments or suggestions..." style="height:100px;"></textarea>
 
   <button class="btn" onclick="submitReview()">Submit</button>
-  <button class="back-btn" onclick="showPage('studentDashboardPage')">↩</button>
+  <button class="back-btn" onclick="clearReviewForm(); showPage('studentDashboardPage')">↩</button>
 </div>
 
 <div id="applicationStatusPage" class="page">
@@ -423,18 +427,20 @@ h1 {
   <button class="btn" onclick="viewAllRequests()">View Requests</button>
   <button class="btn" onclick="viewAllReviews()">See Reviews</button>
   <button class="btn" onclick="loadStudents()">View Students</button>
-  <button class="back-btn" onclick="showPage('mainLoginPage')">↩</button>
+  <button class="back-btn" onclick="logout()">↩ Logout</button>
 </div>
 
 <div id="adminRequestsPage" class="page">
   <h1>All Requests</h1>
   <div id="adminRequestsContainer" style="width:90%; max-width:700px;"></div>
+  <button onclick="clearAllRequests()" class="danger-btn" style="margin-top: 20px;">Delete All Requests</button>
   <button class="back-btn" onclick="showPage('adminDashboard')">↩</button>
 </div>
 
 <div id="adminReviewsPage" class="page">
   <h1>Student Reviews</h1>
   <div id="adminReviewsContainer" style="width:90%; max-width:700px;"></div>
+  <button onclick="clearAllReviews()" class="danger-btn" style="margin-top: 20px;">Delete All Reviews</button>
   <button class="back-btn" onclick="showPage('adminDashboard')">↩</button>
 </div>
 
@@ -453,71 +459,179 @@ h1 {
     </thead>
     <tbody id="studentTableBody"></tbody>
   </table>
+  <button onclick="clearAllStudents()" class="danger-btn" style="margin-top: 20px;">Delete All Students</button>
   <button class="back-btn" onclick="showPage('adminDashboard')">↩</button>
 </div>
 
-<button onclick="clearAllData()" class="danger-btn">Delete All Saved Data</button>
-
-
 <script>
+// Global variables
 let selectedCategory = ""; 
 let selectedHostel = "";
 let calculatedFee = 0;
 
+// Initialize data in localStorage
+function initializeData() {
+    if (!localStorage.getItem('students')) {
+        localStorage.setItem('students', JSON.stringify([]));
+    }
+    if (!localStorage.getItem('applications')) {
+        localStorage.setItem('applications', JSON.stringify([]));
+    }
+    if (!localStorage.getItem('reviews')) {
+        localStorage.setItem('reviews', JSON.stringify([]));
+    }
+}
+
+// Form clearing functions
+function clearLoginForm() {
+    document.getElementById('loginUser').value = '';
+    document.getElementById('loginPass').value = '';
+}
+
+function clearRegistrationForm() {
+    document.getElementById('regName').value = '';
+    document.getElementById('regRoll').value = '';
+    document.getElementById('regEmail').value = '';
+    document.getElementById('regCourse').value = '';
+    document.getElementById('regPass').value = '';
+}
+
+function clearHostelForm() {
+    document.getElementById('hf_washroom').value = 'Attached';
+    document.getElementById('hf_occupancy').value = 'Single';
+    document.getElementById('hf_mess').value = 'Veg';
+    document.getElementById('hf_gym').checked = false;
+    document.getElementById('hf_library').checked = false;
+    document.getElementById('hf_cleaner').checked = false;
+    document.getElementById('hf_feeTable').innerHTML = '';
+    calculatedFee = 0;
+    selectedCategory = '';
+    selectedHostel = '';
+}
+
+function clearReviewForm() {
+    document.querySelectorAll('#reviewPage select').forEach(select => {
+        select.value = 'select';
+    });
+    document.getElementById('rev_comments').value = '';
+}
+
+
+
+
+// Separate Delete Functions - UPDATED
+function clearAllRequests() {
+    if (confirm("Are you sure? This will delete ALL hostel applications and requests.")) {
+        localStorage.setItem('applications', JSON.stringify([]));
+        alert("All requests deleted successfully!");
+        viewAllRequests(); // Refresh the page
+    }
+}
+
+function clearAllReviews() {
+    if (confirm("Are you sure? This will delete ALL student reviews.")) {
+        localStorage.setItem('reviews', JSON.stringify([]));
+        alert("All reviews deleted successfully!");
+        viewAllReviews(); // Refresh the page
+    }
+}
+
+function clearAllStudents() {
+    if (confirm("Are you sure? This will delete ALL student registrations and their applications.")) {
+        localStorage.setItem('students', JSON.stringify([]));
+        localStorage.setItem('applications', JSON.stringify([]));
+        alert("All students and their applications deleted successfully!");
+        loadStudents(); // Refresh the page
+    }
+}
+
+// Complete cleanup function
+function clearAllData() {
+    if (confirm("Are you sure? This will delete ALL student registrations, applications, and reviews.")) {
+        localStorage.setItem('students', JSON.stringify([]));
+        localStorage.setItem('applications', JSON.stringify([]));
+        localStorage.setItem('reviews', JSON.stringify([]));
+        sessionStorage.clear();
+        alert("All data deleted successfully!");
+        showPage('welcomePage');
+    }
+}
+
+// Page navigation
 function showPage(pageId) {
     document.querySelectorAll(".page").forEach(p => p.style.display = "none");
     document.getElementById(pageId).style.display = "flex";
 }
 
-const STUDENTS_KEY = "hms_students";
-const REVIEWS_KEY = "HOSTEL_REVIEWS";
-const APPLICATIONS_KEY = "HOSTEL_APPLICATIONS";
-
+// Registration function
 function registerStudent() {
-    let name = regName.value.trim();
-    let roll = regRoll.value.trim();
-    let email = regEmail.value.trim();
-    let course = regCourse.value.trim();
-    let pass = regPass.value.trim();
+    let name = document.getElementById('regName').value.trim();
+    let roll = document.getElementById('regRoll').value.trim();
+    let email = document.getElementById('regEmail').value.trim();
+    let course = document.getElementById('regCourse').value.trim();
+    let pass = document.getElementById('regPass').value.trim();
 
     if (!name || !roll || !email || !course || !pass) {
         alert("Please fill all fields!");
         return;
     }
 
-    let students = JSON.parse(localStorage.getItem(STUDENTS_KEY)) || [];
-    students.push({ name, roll, email, course, pass });
-    localStorage.setItem(STUDENTS_KEY, JSON.stringify(students));
-
+    const students = JSON.parse(localStorage.getItem('students'));
+    
+    // Check if student already exists
+    if (students.find(s => s.roll === roll)) {
+        alert("Student with this roll number already exists!");
+        return;
+    }
+    
+    // Register new student
+    const newStudent = { name, roll, email, course, pass };
+    students.push(newStudent);
+    localStorage.setItem('students', JSON.stringify(students));
+    
     alert("Registration successful!");
+    clearRegistrationForm();
     showPage("mainLoginPage");
 }
 
+// Login function
 function unifiedLogin() {
-    let username = loginUser.value.trim();
-    let password = loginPass.value.trim();
+    let username = document.getElementById('loginUser').value.trim();
+    let password = document.getElementById('loginPass').value.trim();
 
     if (!username || !password) {
         alert("Enter username and password!");
         return;
     }
 
+    // Admin login
     if (username === "admin" && password === "admin123") {
+        clearLoginForm();
         showPage("adminDashboard");
         return;
     }
 
-    let students = JSON.parse(localStorage.getItem(STUDENTS_KEY)) || [];
-    let student = students.find(s => s.roll === username && s.pass === password);
-
+    // Student login
+    const students = JSON.parse(localStorage.getItem('students'));
+    const student = students.find(s => s.roll === username && s.pass === password);
+    
     if (student) {
         sessionStorage.setItem("loggedInStudent", JSON.stringify(student));
+        clearLoginForm();
         showPage("studentDashboardPage");
     } else {
         alert("Invalid Credentials!");
     }
 }
 
+// Logout function
+function logout() {
+    sessionStorage.removeItem("loggedInStudent");
+    clearLoginForm();
+    showPage("mainLoginPage");
+}
+
+// Hostel selection functions
 function openACPage(category) {
     selectedCategory = category;
     showPage("hostelACPage");
@@ -528,13 +642,14 @@ function chooseACType(hostelName) {
     showPage("hostelFormPage");
 }
 
+// Fee calculation
 function calculateHostelFees() {
-    let washroom = hf_washroom.value;
-    let occupancy = hf_occupancy.value;
-    let mess = hf_mess.value;
-    let gym = hf_gym.checked;
-    let library = hf_library.checked;
-    let cleaner = hf_cleaner.checked;
+    let washroom = document.getElementById('hf_washroom').value;
+    let occupancy = document.getElementById('hf_occupancy').value;
+    let mess = document.getElementById('hf_mess').value;
+    let gym = document.getElementById('hf_gym').checked;
+    let library = document.getElementById('hf_library').checked;
+    let cleaner = document.getElementById('hf_cleaner').checked;
 
     let fee = 0;
     fee += selectedHostel.includes("AC") ? 30000 : 20000;
@@ -550,7 +665,7 @@ function calculateHostelFees() {
 
     calculatedFee = fee;
 
-    hf_feeTable.innerHTML = `
+    document.getElementById('hf_feeTable').innerHTML = `
         <table>
             <tr><th>Category</th><th>Selected</th><th>Fee</th></tr>
             <tr><td>Hostel</td><td>${selectedHostel}</td><td>₹${selectedHostel.includes("AC")?30000:20000}</td></tr>
@@ -565,6 +680,7 @@ function calculateHostelFees() {
     `;
 }
 
+// Submit hostel application
 function submitHostelApplication() {
     const student = JSON.parse(sessionStorage.getItem("loggedInStudent"));
 
@@ -578,129 +694,111 @@ function submitHostelApplication() {
         return;
     }
 
-    const washroom = hf_washroom.value;
-    const occupancy = hf_occupancy.value;
-    const mess = hf_mess.value;
-    const gym = hf_gym.checked;
-    const library = hf_library.checked;
-    const cleaner = hf_cleaner.checked;
-
-    let apps = JSON.parse(localStorage.getItem(APPLICATIONS_KEY)) || [];
-
-    const alreadyApplied = apps.some(app => app.roll === student.roll);
-    if (alreadyApplied) {
-        alert("You already submitted a hostel request!");
-        return;
-    }
+    const washroom = document.getElementById('hf_washroom').value;
+    const occupancy = document.getElementById('hf_occupancy').value;
+    const mess = document.getElementById('hf_mess').value;
+    const gym = document.getElementById('hf_gym').checked;
+    const library = document.getElementById('hf_library').checked;
+    const cleaner = document.getElementById('hf_cleaner').checked;
 
     const newApp = {
         name: student.name,
         roll: student.roll,
         hostel: selectedHostel,
         category: selectedCategory,
-        washroom: washroom,
-        occupancy: occupancy,
-        mess: mess,
-        gym: gym,
-        library: library,
-        cleaner: cleaner,
+        washroom, occupancy, mess, gym, library, cleaner,
         fee: calculatedFee,
         status: "Pending",
         date: new Date().toLocaleString()
     };
 
-    apps.push(newApp);
-    localStorage.setItem(APPLICATIONS_KEY, JSON.stringify(apps));
-
+    const applications = JSON.parse(localStorage.getItem('applications'));
+    
+    // Remove existing application if any
+    const filteredApps = applications.filter(app => app.roll !== student.roll);
+    filteredApps.push(newApp);
+    
+    localStorage.setItem('applications', JSON.stringify(filteredApps));
+    
     alert("Hostel Request Submitted Successfully!");
-    
-    calculatedFee = 0;
-    hf_feeTable.innerHTML = "";
-    
+    clearHostelForm();
     showPage("studentDashboardPage");
 }
 
+// Check application status
 function checkApplicationStatus() {
     const student = JSON.parse(sessionStorage.getItem("loggedInStudent"));
-    let apps = JSON.parse(localStorage.getItem(APPLICATIONS_KEY)) || [];
-    let list = apps.filter(a => a.roll === student.roll);
-
-    if (list.length === 0) {
-        statusContainer.innerHTML = "<p>No applications submitted yet.</p>";
+    const applications = JSON.parse(localStorage.getItem('applications'));
+    const app = applications.find(a => a.roll === student.roll);
+    
+    const container = document.getElementById('statusContainer');
+    
+    if (!app) {
+        container.innerHTML = "<p>No applications submitted yet.</p>";
     } else {
-        statusContainer.innerHTML = list.map(a => `
+        container.innerHTML = `
             <div class="request-card">
-                <p><b>Category:</b> ${a.category}</p>
-                <p><b>Hostel:</b> ${a.hostel}</p>
-                <p><b>Washroom:</b> ${a.washroom}</p>
-                <p><b>Occupancy:</b> ${a.occupancy}</p>
-                <p><b>Mess:</b> ${a.mess}</p>
-                <p><b>Extras:</b> ${[a.gym && 'Gym', a.library && 'Library', a.cleaner && 'Cleaner'].filter(Boolean).join(', ') || 'None'}</p>
-                <p><b>Fee:</b> ₹${a.fee}</p>
-                <p><b>Date:</b> ${a.date}</p>
+                <p><b>Category:</b> ${app.category}</p>
+                <p><b>Hostel:</b> ${app.hostel}</p>
+                <p><b>Washroom:</b> ${app.washroom}</p>
+                <p><b>Occupancy:</b> ${app.occupancy}</p>
+                <p><b>Mess:</b> ${app.mess}</p>
+                <p><b>Extras:</b> ${[app.gym && 'Gym', app.library && 'Library', app.cleaner && 'Cleaner'].filter(Boolean).join(', ') || 'None'}</p>
+                <p><b>Fee:</b> ₹${app.fee}</p>
+                <p><b>Date:</b> ${app.date}</p>
                 <p><b>Status:</b> 
-                    <span class="request-status ${a.status === "Pending" ? "status-pending" : a.status === "Approved" ? "status-approved" : "status-rejected"}">
-                        ${a.status}
+                    <span class="request-status ${app.status === "Pending" ? "status-pending" : app.status === "Approved" ? "status-approved" : "status-rejected"}">
+                        ${app.status}
                     </span>
                 </p>
             </div>
-        `).join("");
+        `;
     }
-
     showPage("applicationStatusPage");
 }
 
+// Submit review
 function submitReview() {
     const student = JSON.parse(sessionStorage.getItem("loggedInStudent"));
+    if (!student) { alert("You must log in first!"); return; }
 
-    if (!student) {
-        alert("You must log in first!");
-        return;
-    }
+    const cleanliness = document.getElementById('rev_cleanliness').value;
+    const mess = document.getElementById('rev_mess').value;
+    const laundry = document.getElementById('rev_laundry').value;
+    const gym = document.getElementById('rev_gym').value;
+    const wifi = document.getElementById('rev_wifi').value;
+    const playground = document.getElementById('rev_playground').value;
+    const maintenance = document.getElementById('rev_maintenance').value;
+    const comments = document.getElementById('rev_comments').value.trim();
 
-    const cleanliness = rev_cleanliness.value;
-    const mess = rev_mess.value;
-    const laundry = rev_laundry.value;
-    const gym = rev_gym.value;
-    const wifi = rev_wifi.value;
-    const playground = rev_playground.value;
-    const maintenance = rev_maintenance.value;
-    const comments = rev_comments.value.trim();
-
-    if (cleanliness === "select" || mess === "select" || laundry === "select" || 
-        gym === "select" || wifi === "select" || playground === "select" || maintenance === "select") {
+    if ([cleanliness,mess,laundry,gym,wifi,playground,maintenance].includes("select")) {
         alert("Please select all ratings!");
         return;
     }
 
-    let reviews = JSON.parse(localStorage.getItem(REVIEWS_KEY)) || [];
-
-    const newReview = {
-        cleanliness,
-        mess,
-        laundry,
-        gym,
-        wifi,
-        playground,
-        maintenance,
-        comments,
-        date: new Date().toLocaleString()
+    const newReview = { 
+        cleanliness, mess, laundry, gym, wifi, playground, maintenance, 
+        comments, date: new Date().toLocaleString() 
     };
 
+    const reviews = JSON.parse(localStorage.getItem('reviews'));
     reviews.push(newReview);
-    localStorage.setItem(REVIEWS_KEY, JSON.stringify(reviews));
-
-    alert("Review submitted successfully!");
-    showPage("studentDashboardPage");
+    localStorage.setItem('reviews', JSON.stringify(reviews));
+    
+    alert("Review submitted successfully!"); 
+    clearReviewForm();
+    showPage("studentDashboardPage"); 
 }
 
+// Admin functions
 function viewAllRequests() {
-    let apps = JSON.parse(localStorage.getItem(APPLICATIONS_KEY)) || [];
+    const applications = JSON.parse(localStorage.getItem('applications'));
+    const container = document.getElementById('adminRequestsContainer');
 
-    if (apps.length === 0) {
-        adminRequestsContainer.innerHTML = "<p>No requests yet.</p>";
+    if (applications.length === 0) {
+        container.innerHTML = "<p>No requests yet.</p>";
     } else {
-        adminRequestsContainer.innerHTML = apps.map((a, index) => `
+        container.innerHTML = applications.map(a => `
             <div class="request-card">
                 <div class="request-header">
                     <p><b>${a.name} (${a.roll})</b></p>
@@ -716,39 +814,33 @@ function viewAllRequests() {
                 <p><b>Extras:</b> ${[a.gym && 'Gym', a.library && 'Library', a.cleaner && 'Cleaner'].filter(Boolean).join(', ') || 'None'}</p>
                 <p><b>Fee:</b> ₹${a.fee}</p>
                 <p><b>Date:</b> ${a.date}</p>
-                <button onclick="updateStatus(${index}, 'Approved')" class="btn">Approve</button>
-                <button onclick="updateStatus(${index}, 'Rejected')" class="btn">Reject</button>
+                <button onclick="updateStatus('${a.roll}','Approved')" class="btn">Approve</button>
+                <button onclick="updateStatus('${a.roll}','Rejected')" class="btn">Reject</button>
             </div>
         `).join("");
     }
-
     showPage("adminRequestsPage");
 }
 
-function clearAllData() {
-    if (confirm("Are you sure? This will delete ALL student registrations, applications, and complaints.")) {
-        localStorage.clear();
-        sessionStorage.clear();
-        alert("All data deleted successfully!");
-        location.reload();
+function updateStatus(roll, status) {
+    const applications = JSON.parse(localStorage.getItem('applications'));
+    const appIndex = applications.findIndex(app => app.roll === roll);
+    
+    if (appIndex !== -1) {
+        applications[appIndex].status = status;
+        localStorage.setItem('applications', JSON.stringify(applications));
+        viewAllRequests();
     }
 }
 
-
-function updateStatus(i, status) {
-    let apps = JSON.parse(localStorage.getItem(APPLICATIONS_KEY)) || [];
-    apps[i].status = status;
-    localStorage.setItem(APPLICATIONS_KEY, JSON.stringify(apps));
-    viewAllRequests();
-}
-
 function viewAllReviews() {
-    let all = JSON.parse(localStorage.getItem(REVIEWS_KEY)) || [];
+    const reviews = JSON.parse(localStorage.getItem('reviews'));
+    const container = document.getElementById('adminReviewsContainer');
 
-    if (all.length === 0) {
-        adminReviewsContainer.innerHTML = "<p>No reviews yet.</p>";
+    if (reviews.length === 0) {
+        container.innerHTML = "<p>No reviews yet.</p>";
     } else {
-        adminReviewsContainer.innerHTML = all.map((r, index) => {
+        container.innerHTML = reviews.map((r, index) => {
             const avg = ((+r.mess + +r.laundry + +r.gym + +r.wifi + +r.playground + +r.cleanliness + +r.maintenance) / 7).toFixed(1);
             return `
                 <div class="review-card">
@@ -763,20 +855,20 @@ function viewAllReviews() {
             `;
         }).join("");
     }
-
     showPage("adminReviewsPage");
 }
 
 function loadStudents() {
-    let students = JSON.parse(localStorage.getItem(STUDENTS_KEY)) || [];
-    let apps = JSON.parse(localStorage.getItem(APPLICATIONS_KEY)) || [];
-    let tbody = document.getElementById("studentTableBody");
+    const students = JSON.parse(localStorage.getItem('students'));
+    const applications = JSON.parse(localStorage.getItem('applications'));
+    
+    const tbody = document.getElementById('studentTableBody');
     
     if (students.length === 0) {
         tbody.innerHTML = "<tr><td colspan='5'>No students registered yet.</td></tr>";
     } else {
         tbody.innerHTML = students.map(s => {
-            const studentApp = apps.find(app => app.roll === s.roll);
+            const studentApp = applications.find(app => app.roll === s.roll);
             const amenities = studentApp ? 
                 `Hostel: ${studentApp.hostel}<br>
                  Washroom: ${studentApp.washroom}<br>
@@ -800,28 +892,28 @@ function loadStudents() {
             `;
         }).join("");
     }
-    
     showPage("adminStudentDetails");
 }
 
 function filterStudents() {
-    let search = document.getElementById("searchStudent").value.toLowerCase();
-    let students = JSON.parse(localStorage.getItem(STUDENTS_KEY)) || [];
-    let apps = JSON.parse(localStorage.getItem(APPLICATIONS_KEY)) || [];
-    let tbody = document.getElementById("studentTableBody");
+    const search = document.getElementById('searchStudent').value.toLowerCase();
+    const students = JSON.parse(localStorage.getItem('students'));
+    const applications = JSON.parse(localStorage.getItem('applications'));
     
-    let filtered = students.filter(s => 
+    const filtered = students.filter(s => 
         s.name.toLowerCase().includes(search) || 
         s.roll.toLowerCase().includes(search) ||
         s.email.toLowerCase().includes(search) ||
         s.course.toLowerCase().includes(search)
     );
     
+    const tbody = document.getElementById('studentTableBody');
+    
     if (filtered.length === 0) {
         tbody.innerHTML = "<tr><td colspan='5'>No matching students found.</td></tr>";
     } else {
         tbody.innerHTML = filtered.map(s => {
-            const studentApp = apps.find(app => app.roll === s.roll);
+            const studentApp = applications.find(app => app.roll === s.roll);
             const amenities = studentApp ? 
                 `Hostel: ${studentApp.hostel}<br>
                  Washroom: ${studentApp.washroom}<br>
@@ -847,82 +939,11 @@ function filterStudents() {
     }
 }
 
+// Initialize the app
 document.addEventListener('DOMContentLoaded', function() {
-    if (!localStorage.getItem(STUDENTS_KEY)) {
-        localStorage.setItem(STUDENTS_KEY, JSON.stringify([]));
-    }
-    if (!localStorage.getItem(REVIEWS_KEY)) {
-        localStorage.setItem(REVIEWS_KEY, JSON.stringify([]));
-    }
-    if (!localStorage.getItem(APPLICATIONS_KEY)) {
-        localStorage.setItem(APPLICATIONS_KEY, JSON.stringify([]));
-    }
-    
+    initializeData();
     showPage('welcomePage');
 });
-
-function addSampleData() {
-    const sampleStudents = [
-        {
-            name: "John Doe",
-            roll: "2023001",
-            email: "john.doe@college.edu",
-            course: "Computer Science",
-            pass: "password123"
-        },
-        {
-            name: "Jane Smith",
-            roll: "2023002", 
-            email: "jane.smith@college.edu",
-            course: "Electrical Engineering",
-            pass: "password123"
-        }
-    ];
-    
-    const sampleApplications = [
-        {
-            name: "John Doe",
-            roll: "2023001",
-            hostel: "Hostel 1 AC",
-            category: "Boys",
-            washroom: "Attached",
-            occupancy: "Single",
-            mess: "Veg",
-            gym: true,
-            library: true,
-            cleaner: false,
-            fee: 66500,
-            status: "Approved",
-            date: new Date().toLocaleString()
-        }
-    ];
-    
-    const sampleReviews = [
-        {
-            cleanliness: "4",
-            mess: "3",
-            laundry: "4",
-            gym: "5",
-            wifi: "2",
-            playground: "4",
-            maintenance: "3",
-            comments: "WiFi needs improvement, otherwise good facilities.",
-            date: new Date().toLocaleString()
-        }
-    ];
-    
-    if (JSON.parse(localStorage.getItem(STUDENTS_KEY)).length === 0) {
-        localStorage.setItem(STUDENTS_KEY, JSON.stringify(sampleStudents));
-    }
-    if (JSON.parse(localStorage.getItem(APPLICATIONS_KEY)).length === 0) {
-        localStorage.setItem(APPLICATIONS_KEY, JSON.stringify(sampleApplications));
-    }
-    if (JSON.parse(localStorage.getItem(REVIEWS_KEY)).length === 0) {
-        localStorage.setItem(REVIEWS_KEY, JSON.stringify(sampleReviews));
-    }
-}
-
-addSampleData();
 </script>
 </body>
 </html>
