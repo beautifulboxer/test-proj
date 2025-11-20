@@ -4,6 +4,27 @@
 <meta charset="UTF-8">
 <title>Hostel Management System</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-firestore-compat.js"></script>
+
+<script>
+// Firebase configuration
+const firebaseConfig = {
+  apiKey: "AIzaSyCmZuXKxdxIG-oOGYYULfYZnHotQ_UkLfE",
+  authDomain: "hostel-allocation-system-9b97f.firebaseapp.com",
+  projectId: "hostel-allocation-system-9b97f",
+  storageBucket: "hostel-allocation-system-9b97f.firebasestorage.app",
+  messagingSenderId: "160944018594",
+  appId: "1:160944018594:web:a6cf27dba04e3e55dd73fb"
+};
+
+// Initialize Firebase
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+</script>
+
 <style>
 * {
   margin: 0;
@@ -235,6 +256,21 @@ h1 {
   font-weight: 600;
   margin: 8px;
 }
+
+.loading {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  border: 3px solid rgba(255,255,255,.3);
+  border-radius: 50%;
+  border-top-color: #fff;
+  animation: spin 1s ease-in-out infinite;
+  margin-right: 10px;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
 </style>
 </head>
 <body>
@@ -261,7 +297,7 @@ h1 {
   <input type="email" id="regEmail" class="input-box" placeholder="Enter Email-ID">
   <input type="text" id="regCourse" class="input-box" placeholder="Enter Course">
   <input type="password" id="regPass" class="input-box" placeholder="Set Password">
-  <button class="btn" onclick="registerStudent()">Register</button>
+  <button class="btn" onclick="registerStudent()" id="registerBtn">Register</button>
   <button class="back-btn" onclick="clearRegistrationForm(); showPage('mainLoginPage')">↩</button>
 </div>
 
@@ -331,7 +367,7 @@ h1 {
   </div>
 
   <div style="margin-top:12px; display:flex; gap:10px;">
-    <button class="btn" onclick="submitHostelApplication()">Submit Application</button>
+    <button class="btn" onclick="submitHostelApplication()" id="submitAppBtn">Submit Application</button>
     <button class="back-btn" onclick="clearHostelForm(); showPage('studentDashboardPage')">Cancel</button>
   </div>
 </div>
@@ -412,7 +448,7 @@ h1 {
   <label>Comments / Suggestions:</label>
   <textarea id="rev_comments" class="input-box" placeholder="Write your comments or suggestions..." style="height:100px;"></textarea>
 
-  <button class="btn" onclick="submitReview()">Submit</button>
+  <button class="btn" onclick="submitReview()" id="submitReviewBtn">Submit</button>
   <button class="back-btn" onclick="clearReviewForm(); showPage('studentDashboardPage')">↩</button>
 </div>
 
@@ -516,9 +552,6 @@ function clearReviewForm() {
     document.getElementById('rev_comments').value = '';
 }
 
-
-
-
 // Separate Delete Functions - UPDATED
 function clearAllRequests() {
     if (confirm("Are you sure? This will delete ALL hostel applications and requests.")) {
@@ -563,8 +596,8 @@ function showPage(pageId) {
     document.getElementById(pageId).style.display = "flex";
 }
 
-// Registration function
-function registerStudent() {
+// Registration function - UPDATED WITH FIREBASE
+async function registerStudent() {
     let name = document.getElementById('regName').value.trim();
     let roll = document.getElementById('regRoll').value.trim();
     let email = document.getElementById('regEmail').value.trim();
@@ -576,26 +609,49 @@ function registerStudent() {
         return;
     }
 
-    const students = JSON.parse(localStorage.getItem('students'));
-    
-    // Check if student already exists
-    if (students.find(s => s.roll === roll)) {
-        alert("Student with this roll number already exists!");
-        return;
+    // Show loading state
+    const registerBtn = document.getElementById('registerBtn');
+    registerBtn.innerHTML = '<span class="loading"></span> Registering...';
+    registerBtn.disabled = true;
+
+    try {
+        // Firebase check
+        const snapshot = await db.collection('students')
+            .where('roll', '==', roll)
+            .get();
+        
+        if (!snapshot.empty) {
+            alert("Roll number already exists!");
+            return;
+        }
+        
+        // Save to Firebase
+        await db.collection('students').add({
+            name, roll, email, course, password: pass,
+            createdAt: new Date()
+        });
+
+        // Also save to localStorage for backward compatibility
+        const students = JSON.parse(localStorage.getItem('students'));
+        const newStudent = { name, roll, email, course, pass };
+        students.push(newStudent);
+        localStorage.setItem('students', JSON.stringify(students));
+        
+        alert("Registration successful!");
+        clearRegistrationForm();
+        showPage("mainLoginPage");
+    } catch (error) {
+        console.error("Error registering student:", error);
+        alert("Registration failed. Please try again.");
+    } finally {
+        // Reset button state
+        registerBtn.innerHTML = 'Register';
+        registerBtn.disabled = false;
     }
-    
-    // Register new student
-    const newStudent = { name, roll, email, course, pass };
-    students.push(newStudent);
-    localStorage.setItem('students', JSON.stringify(students));
-    
-    alert("Registration successful!");
-    clearRegistrationForm();
-    showPage("mainLoginPage");
 }
 
-// Login function
-function unifiedLogin() {
+// Login function - UPDATED WITH FIREBASE
+async function unifiedLogin() {
     let username = document.getElementById('loginUser').value.trim();
     let password = document.getElementById('loginPass').value.trim();
 
@@ -611,16 +667,34 @@ function unifiedLogin() {
         return;
     }
 
-    // Student login
-    const students = JSON.parse(localStorage.getItem('students'));
-    const student = students.find(s => s.roll === username && s.pass === password);
-    
-    if (student) {
-        sessionStorage.setItem("loggedInStudent", JSON.stringify(student));
-        clearLoginForm();
-        showPage("studentDashboardPage");
-    } else {
-        alert("Invalid Credentials!");
+    // Student login - Check Firebase first
+    try {
+        const snapshot = await db.collection('students')
+            .where('roll', '==', username)
+            .where('password', '==', password)
+            .get();
+        
+        if (!snapshot.empty) {
+            const student = snapshot.docs[0].data();
+            sessionStorage.setItem("loggedInStudent", JSON.stringify(student));
+            clearLoginForm();
+            showPage("studentDashboardPage");
+        } else {
+            // Fallback to localStorage for backward compatibility
+            const students = JSON.parse(localStorage.getItem('students'));
+            const student = students.find(s => s.roll === username && s.pass === password);
+            
+            if (student) {
+                sessionStorage.setItem("loggedInStudent", JSON.stringify(student));
+                clearLoginForm();
+                showPage("studentDashboardPage");
+            } else {
+                alert("Invalid Credentials!");
+            }
+        }
+    } catch (error) {
+        console.error("Error during login:", error);
+        alert("Login failed. Please try again.");
     }
 }
 
@@ -680,8 +754,8 @@ function calculateHostelFees() {
     `;
 }
 
-// Submit hostel application
-function submitHostelApplication() {
+// Submit hostel application - UPDATED WITH FIREBASE
+async function submitHostelApplication() {
     const student = JSON.parse(sessionStorage.getItem("loggedInStudent"));
 
     if (!student) {
@@ -709,56 +783,107 @@ function submitHostelApplication() {
         washroom, occupancy, mess, gym, library, cleaner,
         fee: calculatedFee,
         status: "Pending",
-        date: new Date().toLocaleString()
+        date: new Date().toLocaleString(),
+        createdAt: new Date()
     };
 
-    const applications = JSON.parse(localStorage.getItem('applications'));
-    
-    // Remove existing application if any
-    const filteredApps = applications.filter(app => app.roll !== student.roll);
-    filteredApps.push(newApp);
-    
-    localStorage.setItem('applications', JSON.stringify(filteredApps));
-    
-    alert("Hostel Request Submitted Successfully!");
-    clearHostelForm();
-    showPage("studentDashboardPage");
+    // Show loading state
+    const submitBtn = document.getElementById('submitAppBtn');
+    submitBtn.innerHTML = '<span class="loading"></span> Submitting...';
+    submitBtn.disabled = true;
+
+    try {
+        // Save to Firebase
+        await db.collection('applications').add(newApp);
+        
+        // Also save to localStorage for backward compatibility
+        const applications = JSON.parse(localStorage.getItem('applications'));
+        const filteredApps = applications.filter(app => app.roll !== student.roll);
+        filteredApps.push(newApp);
+        localStorage.setItem('applications', JSON.stringify(filteredApps));
+        
+        alert("Hostel Request Submitted Successfully!");
+        clearHostelForm();
+        showPage("studentDashboardPage");
+    } catch (error) {
+        console.error("Error submitting application:", error);
+        alert("Submission failed. Please try again.");
+    } finally {
+        // Reset button state
+        submitBtn.innerHTML = 'Submit Application';
+        submitBtn.disabled = false;
+    }
 }
 
-// Check application status
-function checkApplicationStatus() {
+// Check application status - UPDATED WITH FIREBASE
+async function checkApplicationStatus() {
     const student = JSON.parse(sessionStorage.getItem("loggedInStudent"));
-    const applications = JSON.parse(localStorage.getItem('applications'));
-    const app = applications.find(a => a.roll === student.roll);
     
     const container = document.getElementById('statusContainer');
+    container.innerHTML = '<p>Loading...</p>';
     
-    if (!app) {
-        container.innerHTML = "<p>No applications submitted yet.</p>";
-    } else {
-        container.innerHTML = `
-            <div class="request-card">
-                <p><b>Category:</b> ${app.category}</p>
-                <p><b>Hostel:</b> ${app.hostel}</p>
-                <p><b>Washroom:</b> ${app.washroom}</p>
-                <p><b>Occupancy:</b> ${app.occupancy}</p>
-                <p><b>Mess:</b> ${app.mess}</p>
-                <p><b>Extras:</b> ${[app.gym && 'Gym', app.library && 'Library', app.cleaner && 'Cleaner'].filter(Boolean).join(', ') || 'None'}</p>
-                <p><b>Fee:</b> ₹${app.fee}</p>
-                <p><b>Date:</b> ${app.date}</p>
-                <p><b>Status:</b> 
-                    <span class="request-status ${app.status === "Pending" ? "status-pending" : app.status === "Approved" ? "status-approved" : "status-rejected"}">
-                        ${app.status}
-                    </span>
-                </p>
-            </div>
-        `;
+    try {
+        // Check Firebase first
+        const snapshot = await db.collection('applications')
+            .where('roll', '==', student.roll)
+            .get();
+        
+        if (!snapshot.empty) {
+            const app = snapshot.docs[0].data();
+            container.innerHTML = `
+                <div class="request-card">
+                    <p><b>Category:</b> ${app.category}</p>
+                    <p><b>Hostel:</b> ${app.hostel}</p>
+                    <p><b>Washroom:</b> ${app.washroom}</p>
+                    <p><b>Occupancy:</b> ${app.occupancy}</p>
+                    <p><b>Mess:</b> ${app.mess}</p>
+                    <p><b>Extras:</b> ${[app.gym && 'Gym', app.library && 'Library', app.cleaner && 'Cleaner'].filter(Boolean).join(', ') || 'None'}</p>
+                    <p><b>Fee:</b> ₹${app.fee}</p>
+                    <p><b>Date:</b> ${app.date}</p>
+                    <p><b>Status:</b> 
+                        <span class="request-status ${app.status === "Pending" ? "status-pending" : app.status === "Approved" ? "status-approved" : "status-rejected"}">
+                            ${app.status}
+                        </span>
+                    </p>
+                </div>
+            `;
+        } else {
+            // Fallback to localStorage
+            const applications = JSON.parse(localStorage.getItem('applications'));
+            const app = applications.find(a => a.roll === student.roll);
+            
+            if (!app) {
+                container.innerHTML = "<p>No applications submitted yet.</p>";
+            } else {
+                container.innerHTML = `
+                    <div class="request-card">
+                        <p><b>Category:</b> ${app.category}</p>
+                        <p><b>Hostel:</b> ${app.hostel}</p>
+                        <p><b>Washroom:</b> ${app.washroom}</p>
+                        <p><b>Occupancy:</b> ${app.occupancy}</p>
+                        <p><b>Mess:</b> ${app.mess}</p>
+                        <p><b>Extras:</b> ${[app.gym && 'Gym', app.library && 'Library', app.cleaner && 'Cleaner'].filter(Boolean).join(', ') || 'None'}</p>
+                        <p><b>Fee:</b> ₹${app.fee}</p>
+                        <p><b>Date:</b> ${app.date}</p>
+                        <p><b>Status:</b> 
+                            <span class="request-status ${app.status === "Pending" ? "status-pending" : app.status === "Approved" ? "status-approved" : "status-rejected"}">
+                                ${app.status}
+                            </span>
+                        </p>
+                    </div>
+                `;
+            }
+        }
+    } catch (error) {
+        console.error("Error checking application status:", error);
+        container.innerHTML = "<p>Error loading application status.</p>";
     }
+    
     showPage("applicationStatusPage");
 }
 
-// Submit review
-function submitReview() {
+// Submit review - UPDATED WITH FIREBASE
+async function submitReview() {
     const student = JSON.parse(sessionStorage.getItem("loggedInStudent"));
     if (!student) { alert("You must log in first!"); return; }
 
@@ -778,119 +903,255 @@ function submitReview() {
 
     const newReview = { 
         cleanliness, mess, laundry, gym, wifi, playground, maintenance, 
-        comments, date: new Date().toLocaleString() 
+        comments, date: new Date().toLocaleString(),
+        createdAt: new Date()
     };
 
-    const reviews = JSON.parse(localStorage.getItem('reviews'));
-    reviews.push(newReview);
-    localStorage.setItem('reviews', JSON.stringify(reviews));
-    
-    alert("Review submitted successfully!"); 
-    clearReviewForm();
-    showPage("studentDashboardPage"); 
+    // Show loading state
+    const submitBtn = document.getElementById('submitReviewBtn');
+    submitBtn.innerHTML = '<span class="loading"></span> Submitting...';
+    submitBtn.disabled = true;
+
+    try {
+        // Save to Firebase
+        await db.collection('reviews').add(newReview);
+        
+        // Also save to localStorage for backward compatibility
+        const reviews = JSON.parse(localStorage.getItem('reviews'));
+        reviews.push(newReview);
+        localStorage.setItem('reviews', JSON.stringify(reviews));
+        
+        alert("Review submitted successfully!"); 
+        clearReviewForm();
+        showPage("studentDashboardPage");
+    } catch (error) {
+        console.error("Error submitting review:", error);
+        alert("Review submission failed. Please try again.");
+    } finally {
+        // Reset button state
+        submitBtn.innerHTML = 'Submit';
+        submitBtn.disabled = false;
+    }
 }
 
-// Admin functions
-function viewAllRequests() {
-    const applications = JSON.parse(localStorage.getItem('applications'));
+// Admin functions - UPDATED WITH FIREBASE
+async function viewAllRequests() {
     const container = document.getElementById('adminRequestsContainer');
-
-    if (applications.length === 0) {
-        container.innerHTML = "<p>No requests yet.</p>";
-    } else {
-        container.innerHTML = applications.map(a => `
-            <div class="request-card">
-                <div class="request-header">
-                    <p><b>${a.name} (${a.roll})</b></p>
-                    <span class="request-status ${a.status === "Pending" ? "status-pending" : a.status === "Approved" ? "status-approved" : "status-rejected"}">
-                        ${a.status}
-                    </span>
+    container.innerHTML = '<p>Loading...</p>';
+    
+    try {
+        // Get data from Firebase
+        const snapshot = await db.collection('applications').get();
+        const applications = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        
+        if (applications.length === 0) {
+            container.innerHTML = "<p>No requests yet.</p>";
+        } else {
+            container.innerHTML = applications.map(a => `
+                <div class="request-card">
+                    <div class="request-header">
+                        <p><b>${a.name} (${a.roll})</b></p>
+                        <span class="request-status ${a.status === "Pending" ? "status-pending" : a.status === "Approved" ? "status-approved" : "status-rejected"}">
+                            ${a.status}
+                        </span>
+                    </div>
+                    <p><b>Category:</b> ${a.category}</p>
+                    <p><b>Hostel:</b> ${a.hostel}</p>
+                    <p><b>Washroom:</b> ${a.washroom}</p>
+                    <p><b>Occupancy:</b> ${a.occupancy}</p>
+                    <p><b>Mess:</b> ${a.mess}</p>
+                    <p><b>Extras:</b> ${[a.gym && 'Gym', a.library && 'Library', a.cleaner && 'Cleaner'].filter(Boolean).join(', ') || 'None'}</p>
+                    <p><b>Fee:</b> ₹${a.fee}</p>
+                    <p><b>Date:</b> ${a.date}</p>
+                    <button onclick="updateStatus('${a.id}','${a.roll}','Approved')" class="btn">Approve</button>
+                    <button onclick="updateStatus('${a.id}','${a.roll}','Rejected')" class="btn">Reject</button>
                 </div>
-                <p><b>Category:</b> ${a.category}</p>
-                <p><b>Hostel:</b> ${a.hostel}</p>
-                <p><b>Washroom:</b> ${a.washroom}</p>
-                <p><b>Occupancy:</b> ${a.occupancy}</p>
-                <p><b>Mess:</b> ${a.mess}</p>
-                <p><b>Extras:</b> ${[a.gym && 'Gym', a.library && 'Library', a.cleaner && 'Cleaner'].filter(Boolean).join(', ') || 'None'}</p>
-                <p><b>Fee:</b> ₹${a.fee}</p>
-                <p><b>Date:</b> ${a.date}</p>
-                <button onclick="updateStatus('${a.roll}','Approved')" class="btn">Approve</button>
-                <button onclick="updateStatus('${a.roll}','Rejected')" class="btn">Reject</button>
-            </div>
-        `).join("");
+            `).join("");
+        }
+    } catch (error) {
+        console.error("Error loading requests:", error);
+        // Fallback to localStorage
+        const applications = JSON.parse(localStorage.getItem('applications'));
+        
+        if (applications.length === 0) {
+            container.innerHTML = "<p>No requests yet.</p>";
+        } else {
+            container.innerHTML = applications.map(a => `
+                <div class="request-card">
+                    <div class="request-header">
+                        <p><b>${a.name} (${a.roll})</b></p>
+                        <span class="request-status ${a.status === "Pending" ? "status-pending" : a.status === "Approved" ? "status-approved" : "status-rejected"}">
+                            ${a.status}
+                        </span>
+                    </div>
+                    <p><b>Category:</b> ${a.category}</p>
+                    <p><b>Hostel:</b> ${a.hostel}</p>
+                    <p><b>Washroom:</b> ${a.washroom}</p>
+                    <p><b>Occupancy:</b> ${a.occupancy}</p>
+                    <p><b>Mess:</b> ${a.mess}</p>
+                    <p><b>Extras:</b> ${[a.gym && 'Gym', a.library && 'Library', a.cleaner && 'Cleaner'].filter(Boolean).join(', ') || 'None'}</p>
+                    <p><b>Fee:</b> ₹${a.fee}</p>
+                    <p><b>Date:</b> ${a.date}</p>
+                    <button onclick="updateStatus('${a.roll}','Approved')" class="btn">Approve</button>
+                    <button onclick="updateStatus('${a.roll}','Rejected')" class="btn">Reject</button>
+                </div>
+            `).join("");
+        }
     }
     showPage("adminRequestsPage");
 }
 
-function updateStatus(roll, status) {
-    const applications = JSON.parse(localStorage.getItem('applications'));
-    const appIndex = applications.findIndex(app => app.roll === roll);
-    
-    if (appIndex !== -1) {
-        applications[appIndex].status = status;
-        localStorage.setItem('applications', JSON.stringify(applications));
+async function updateStatus(id, roll, status) {
+    try {
+        // Update in Firebase
+        if (id) {
+            await db.collection('applications').doc(id).update({ status });
+        }
+        
+        // Also update in localStorage for backward compatibility
+        const applications = JSON.parse(localStorage.getItem('applications'));
+        const appIndex = applications.findIndex(app => app.roll === roll);
+        
+        if (appIndex !== -1) {
+            applications[appIndex].status = status;
+            localStorage.setItem('applications', JSON.stringify(applications));
+        }
+        
         viewAllRequests();
+    } catch (error) {
+        console.error("Error updating status:", error);
+        alert("Failed to update status. Please try again.");
     }
 }
 
-function viewAllReviews() {
-    const reviews = JSON.parse(localStorage.getItem('reviews'));
+async function viewAllReviews() {
     const container = document.getElementById('adminReviewsContainer');
-
-    if (reviews.length === 0) {
-        container.innerHTML = "<p>No reviews yet.</p>";
-    } else {
-        container.innerHTML = reviews.map((r, index) => {
-            const avg = ((+r.mess + +r.laundry + +r.gym + +r.wifi + +r.playground + +r.cleanliness + +r.maintenance) / 7).toFixed(1);
-            return `
-                <div class="review-card">
-                    <p><b>Review #${index + 1}</b> - ${r.date}</p>
-                    <p><b>Ratings:</b></p>
-                    <p>Mess: ${r.mess}/5 | Laundry: ${r.laundry}/5 | Gym: ${r.gym}/5</p>
-                    <p>WiFi: ${r.wifi}/5 | Playground: ${r.playground}/5</p>
-                    <p>Cleanliness: ${r.cleanliness}/5 | Maintenance: ${r.maintenance}/5</p>
-                    <p><b>Average Rating:</b> ${avg}/5</p>
-                    <p><b>Comments:</b> ${r.comments || "No comments"}</p>
-                </div>
-            `;
-        }).join("");
+    container.innerHTML = '<p>Loading...</p>';
+    
+    try {
+        // Get data from Firebase
+        const snapshot = await db.collection('reviews').get();
+        const reviews = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        
+        if (reviews.length === 0) {
+            container.innerHTML = "<p>No reviews yet.</p>";
+        } else {
+            container.innerHTML = reviews.map((r, index) => {
+                const avg = ((+r.mess + +r.laundry + +r.gym + +r.wifi + +r.playground + +r.cleanliness + +r.maintenance) / 7).toFixed(1);
+                return `
+                    <div class="review-card">
+                        <p><b>Review #${index + 1}</b> - ${r.date}</p>
+                        <p><b>Ratings:</b></p>
+                        <p>Mess: ${r.mess}/5 | Laundry: ${r.laundry}/5 | Gym: ${r.gym}/5</p>
+                        <p>WiFi: ${r.wifi}/5 | Playground: ${r.playground}/5</p>
+                        <p>Cleanliness: ${r.cleanliness}/5 | Maintenance: ${r.maintenance}/5</p>
+                        <p><b>Average Rating:</b> ${avg}/5</p>
+                        <p><b>Comments:</b> ${r.comments || "No comments"}</p>
+                    </div>
+                `;
+            }).join("");
+        }
+    } catch (error) {
+        console.error("Error loading reviews:", error);
+        // Fallback to localStorage
+        const reviews = JSON.parse(localStorage.getItem('reviews'));
+        
+        if (reviews.length === 0) {
+            container.innerHTML = "<p>No reviews yet.</p>";
+        } else {
+            container.innerHTML = reviews.map((r, index) => {
+                const avg = ((+r.mess + +r.laundry + +r.gym + +r.wifi + +r.playground + +r.cleanliness + +r.maintenance) / 7).toFixed(1);
+                return `
+                    <div class="review-card">
+                        <p><b>Review #${index + 1}</b> - ${r.date}</p>
+                        <p><b>Ratings:</b></p>
+                        <p>Mess: ${r.mess}/5 | Laundry: ${r.laundry}/5 | Gym: ${r.gym}/5</p>
+                        <p>WiFi: ${r.wifi}/5 | Playground: ${r.playground}/5</p>
+                        <p>Cleanliness: ${r.cleanliness}/5 | Maintenance: ${r.maintenance}/5</p>
+                        <p><b>Average Rating:</b> ${avg}/5</p>
+                        <p><b>Comments:</b> ${r.comments || "No comments"}</p>
+                    </div>
+                `;
+            }).join("");
+        }
     }
     showPage("adminReviewsPage");
 }
 
-function loadStudents() {
-    const students = JSON.parse(localStorage.getItem('students'));
-    const applications = JSON.parse(localStorage.getItem('applications'));
-    
+async function loadStudents() {
     const tbody = document.getElementById('studentTableBody');
+    tbody.innerHTML = '<tr><td colspan="5">Loading...</td></tr>';
     
-    if (students.length === 0) {
-        tbody.innerHTML = "<tr><td colspan='5'>No students registered yet.</td></tr>";
-    } else {
-        tbody.innerHTML = students.map(s => {
-            const studentApp = applications.find(app => app.roll === s.roll);
-            const amenities = studentApp ? 
-                `Hostel: ${studentApp.hostel}<br>
-                 Washroom: ${studentApp.washroom}<br>
-                 Occupancy: ${studentApp.occupancy}<br>
-                 Mess: ${studentApp.mess}<br>
-                 Extras: ${[
-                     studentApp.gym && 'Gym', 
-                     studentApp.library && 'Library', 
-                     studentApp.cleaner && 'Cleaner'
-                 ].filter(Boolean).join(', ') || 'None'}` 
-                : 'No application submitted';
-            
-            return `
-                <tr>
-                    <td>${s.name}</td>
-                    <td>${s.roll}</td>
-                    <td>${s.email}</td>
-                    <td>${s.course}</td>
-                    <td style="text-align: left; font-size: 12px;">${amenities}</td>
-                </tr>
-            `;
-        }).join("");
+    try {
+        // Get data from Firebase
+        const studentsSnapshot = await db.collection('students').get();
+        const students = studentsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        
+        const applicationsSnapshot = await db.collection('applications').get();
+        const applications = applicationsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        
+        if (students.length === 0) {
+            tbody.innerHTML = "<tr><td colspan='5'>No students registered yet.</td></tr>";
+        } else {
+            tbody.innerHTML = students.map(s => {
+                const studentApp = applications.find(app => app.roll === s.roll);
+                const amenities = studentApp ? 
+                    `Hostel: ${studentApp.hostel}<br>
+                     Washroom: ${studentApp.washroom}<br>
+                     Occupancy: ${studentApp.occupancy}<br>
+                     Mess: ${studentApp.mess}<br>
+                     Extras: ${[
+                         studentApp.gym && 'Gym', 
+                         studentApp.library && 'Library', 
+                         studentApp.cleaner && 'Cleaner'
+                     ].filter(Boolean).join(', ') || 'None'}` 
+                    : 'No application submitted';
+                
+                return `
+                    <tr>
+                        <td>${s.name}</td>
+                        <td>${s.roll}</td>
+                        <td>${s.email}</td>
+                        <td>${s.course}</td>
+                        <td style="text-align: left; font-size: 12px;">${amenities}</td>
+                    </tr>
+                `;
+            }).join("");
+        }
+    } catch (error) {
+        console.error("Error loading students:", error);
+        // Fallback to localStorage
+        const students = JSON.parse(localStorage.getItem('students'));
+        const applications = JSON.parse(localStorage.getItem('applications'));
+        
+        if (students.length === 0) {
+            tbody.innerHTML = "<tr><td colspan='5'>No students registered yet.</td></tr>";
+        } else {
+            tbody.innerHTML = students.map(s => {
+                const studentApp = applications.find(app => app.roll === s.roll);
+                const amenities = studentApp ? 
+                    `Hostel: ${studentApp.hostel}<br>
+                     Washroom: ${studentApp.washroom}<br>
+                     Occupancy: ${studentApp.occupancy}<br>
+                     Mess: ${studentApp.mess}<br>
+                     Extras: ${[
+                         studentApp.gym && 'Gym', 
+                         studentApp.library && 'Library', 
+                         studentApp.cleaner && 'Cleaner'
+                     ].filter(Boolean).join(', ') || 'None'}` 
+                    : 'No application submitted';
+                
+                return `
+                    <tr>
+                        <td>${s.name}</td>
+                        <td>${s.roll}</td>
+                        <td>${s.email}</td>
+                        <td>${s.course}</td>
+                        <td style="text-align: left; font-size: 12px;">${amenities}</td>
+                    </tr>
+                `;
+            }).join("");
+        }
     }
     showPage("adminStudentDetails");
 }
