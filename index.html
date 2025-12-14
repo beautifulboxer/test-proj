@@ -360,6 +360,18 @@ h1 {
   text-align: left;
   line-height: 1.4;
 }
+
+  <div id="studentRegisterPage" class="page">
+  <h1>Student Registration</h1>
+  <input type="text" id="regName" class="input-box" placeholder="Name (Letters only)">
+  <input type="text" id="regRoll" class="input-box" placeholder="Roll No (Letters & numbers)">
+  <input type="email" id="regEmail" class="input-box" placeholder="Email (example@domain.com)">
+  <input type="text" id="regCourse" class="input-box" placeholder="Enter Course">
+  <input type="password" id="regPass" class="input-box" placeholder="Password (Min 6 characters)">
+  <button class="btn" onclick="registerStudent()" id="registerBtn">Register</button>
+  <button class="back-btn" onclick="clearRegistrationForm(); showPage('mainLoginPage')">↩</button>
+</div>
+  
 </style>
 </head>
 <body>
@@ -389,15 +401,93 @@ h1 {
 </div>
 
 <div id="studentRegisterPage" class="page">
-  <h1>Student Registration</h1>
-  <input type="text" id="regName" class="input-box" placeholder="Enter Name">
-  <input type="text" id="regRoll" class="input-box" placeholder="Enter Roll No">
-  <input type="email" id="regEmail" class="input-box" placeholder="Enter Email-ID">
-  <input type="text" id="regCourse" class="input-box" placeholder="Enter Course">
-  <input type="password" id="regPass" class="input-box" placeholder="Set Password">
-  <button class="btn" onclick="registerStudent()" id="registerBtn">Register</button>
-  <button class="back-btn" onclick="clearRegistrationForm(); showPage('mainLoginPage')">↩</button>
-</div>
+ async function registerStudent() {
+    let name = document.getElementById('regName').value.trim();
+    let roll = document.getElementById('regRoll').value.trim();
+    let email = document.getElementById('regEmail').value.trim();
+    let course = document.getElementById('regCourse').value.trim();
+    let pass = document.getElementById('regPass').value.trim();
+
+    // SIMPLE VALIDATION CHECKS
+    if (!name || !roll || !email || !course || !pass) {
+        alert("Please fill all fields!");
+        return;
+    }
+
+    // Name validation - only letters and spaces
+    if (!/^[A-Za-z\s]+$/.test(name)) {
+        alert("Name can only contain letters and spaces!");
+        return;
+    }
+
+    // Roll number validation - alphanumeric only
+    if (!/^[A-Za-z0-9]+$/.test(roll)) {
+        alert("Roll number can only contain letters and numbers!");
+        return;
+    }
+
+    // Email validation - basic format check
+    if (!/^\S+@\S+\.\S+$/.test(email)) {
+        alert("Please enter a valid email (example@domain.com)!");
+        return;
+    }
+
+    // Password length check
+    if (pass.length < 6) {
+        alert("Password must be at least 6 characters!");
+        return;
+    }
+
+    // Show loading state
+    const registerBtn = document.getElementById('registerBtn');
+    registerBtn.innerHTML = '<span class="loading"></span> Registering...';
+    registerBtn.disabled = true;
+
+    try {
+        // Firebase check
+        const snapshot = await db.collection('students')
+            .where('roll', '==', roll)
+            .get();
+        
+        if (!snapshot.empty) {
+            alert("Roll number already exists!");
+            return;
+        }
+        
+        // Also check if email already exists
+        const emailSnapshot = await db.collection('students')
+            .where('email', '==', email)
+            .get();
+        
+        if (!emailSnapshot.empty) {
+            alert("Email already registered!");
+            return;
+        }
+
+        // Save to Firebase
+        await db.collection('students').add({
+            name, roll, email, course, password: pass,
+            createdAt: new Date()
+        });
+
+        // Also save to localStorage for backward compatibility
+        const students = JSON.parse(localStorage.getItem('students'));
+        const newStudent = { name, roll, email, course, pass };
+        students.push(newStudent);
+        localStorage.setItem('students', JSON.stringify(students));
+        
+        alert("Registration successful!");
+        clearRegistrationForm();
+        showPage("mainLoginPage");
+    } catch (error) {
+        console.error("Error registering student:", error);
+        alert("Registration failed. Please try again.");
+    } finally {
+        // Reset button state
+        registerBtn.innerHTML = 'Register';
+        registerBtn.disabled = false;
+    }
+}
 
 <div id="studentDashboardPage" class="page">
   <h1>Welcome Student</h1>
@@ -1500,3 +1590,4 @@ document.addEventListener('DOMContentLoaded', function() {
 </script>
 </body>
 </html>
+
