@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <head>
 <meta charset="UTF-8">
 <title>Hostel Management System</title>
@@ -39,14 +40,16 @@ body {
   justify-content: center;
   animation: fadeIn 0.4s;
   width: 100%;
-  height: 100vh;
+  min-height: 100vh;
   padding: 20px;
   background: linear-gradient(135deg, #e8f0ff, #ffffff, #d9e9ff);
+  overflow-y: auto;
 }
 
 #welcomePage {
   position: relative;
   overflow: hidden;
+  background-color: #2c3e50;
 }
 
 #welcomePage::after {
@@ -85,11 +88,15 @@ h1 {
 .arrow-btn,
 .btn,
 .neon-btn,
-.back-btn {
+.back-btn,
+.danger-btn,
+.search-btn {
   cursor: pointer;
   border: none;
   border-radius: 10px;
   transition: 0.3s;
+  min-height: 48px;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .arrow-btn {
@@ -166,21 +173,25 @@ h1 {
 
 .horizontal-btns {
   display: flex;
-  gap: 20px;
+  gap: 15px;
   flex-wrap: wrap;
   justify-content: center;
   margin-top: 15px;
+  width: 100%;
+  max-width: 800px;
 }
 
 .fee-table {
   width: 90%;
   max-width: 600px;
   margin-top: 12px;
+  overflow-x: auto;
 }
 
 .fee-table table {
   width: 100%;
   border-collapse: collapse;
+  min-width: 300px;
 }
 
 .fee-table th,
@@ -208,10 +219,11 @@ h1 {
 .request-card, .review-card, .student-detail-card {
   background: #fff;
   padding: 16px;
-  margin: 12px 0;
+  margin: 12px auto;
   border-radius: 10px;
   box-shadow: 0 2px 12px rgba(0,0,0,0.1);
-  width: 100%;
+  width: 95%;
+  max-width: 900px;
 }
 
 .request-header, .student-detail-row {
@@ -361,17 +373,288 @@ h1 {
   line-height: 1.4;
 }
 
-  <div id="studentRegisterPage" class="page">
-  <h1>Student Registration</h1>
-  <input type="text" id="regName" class="input-box" placeholder="Name (Letters only)">
-  <input type="text" id="regRoll" class="input-box" placeholder="Roll No (Letters & numbers)">
-  <input type="email" id="regEmail" class="input-box" placeholder="Email (example@domain.com)">
-  <input type="text" id="regCourse" class="input-box" placeholder="Enter Course">
-  <input type="password" id="regPass" class="input-box" placeholder="Password (Min 6 characters)">
-  <button class="btn" onclick="registerStudent()" id="registerBtn">Register</button>
-  <button class="back-btn" onclick="clearRegistrationForm(); showPage('mainLoginPage')">↩</button>
-</div>
-  
+/* Make selects easier to tap on mobile */
+select.input-box {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%236e7aff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  background-size: 16px;
+  padding-right: 35px;
+}
+
+/* Make checkboxes easier to tap */
+input[type="checkbox"] {
+  transform: scale(1.2);
+  margin-right: 8px;
+}
+
+/* Container styles */
+#statusContainer,
+#adminRequestsContainer,
+#adminReviewsContainer {
+  width: 95%;
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+/* Table container */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 300px;
+}
+
+/* Responsive Design for Mobile */
+@media screen and (max-width: 768px) {
+    h1 {
+        font-size: 28px !important;
+        margin-bottom: 15px;
+        text-shadow: 1px 1px 0 #d4d4d4, 2px 2px 4px rgba(0, 0, 0, 0.2);
+    }
+    
+    #welcomePage h1 {
+        font-size: 32px !important;
+        padding: 0 15px;
+    }
+    
+    .page {
+        padding: 10px;
+        justify-content: flex-start;
+        padding-top: 30px;
+        height: auto;
+        min-height: 100vh;
+    }
+    
+    .input-box {
+        width: 90% !important;
+        max-width: 300px;
+        margin: 8px auto;
+        font-size: 16px;
+    }
+    
+    .btn, .neon-btn, .back-btn, .danger-btn, .search-btn {
+        width: 90%;
+        max-width: 300px;
+        padding: 14px 20px;
+        font-size: 16px;
+        margin: 8px auto;
+        min-height: 44px;
+    }
+    
+    .arrow-btn {
+        width: 60px;
+        height: 60px;
+        font-size: 28px;
+        margin-top: 20px;
+    }
+    
+    .horizontal-btns {
+        flex-direction: column;
+        align-items: center;
+        width: 90%;
+        max-width: 300px;
+        gap: 10px;
+    }
+    
+    .horizontal-btns .btn {
+        width: 100%;
+    }
+    
+    .fee-table {
+        width: 95% !important;
+        overflow-x: auto;
+    }
+    
+    .fee-table table {
+        font-size: 14px;
+    }
+    
+    .fee-table th,
+    .fee-table td {
+        padding: 6px;
+        font-size: 13px;
+    }
+    
+    .request-card, .review-card, .student-detail-card {
+        padding: 12px;
+        margin: 10px 0;
+        width: 95%;
+    }
+    
+    .request-details {
+        grid-template-columns: 1fr !important;
+        gap: 8px;
+    }
+    
+    .request-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+    }
+    
+    .request-actions {
+        flex-direction: column;
+        gap: 8px;
+    }
+    
+    .request-actions .btn {
+        width: 100%;
+    }
+    
+    .search-container {
+        flex-direction: column;
+        width: 95%;
+        gap: 8px;
+    }
+    
+    .search-input {
+        width: 100%;
+    }
+    
+    table {
+        font-size: 12px;
+        overflow-x: auto;
+        display: block;
+    }
+    
+    table th,
+    table td {
+        padding: 6px 4px;
+        font-size: 12px;
+    }
+    
+    .amenities-list {
+        font-size: 11px;
+        line-height: 1.3;
+    }
+    
+    /* Review page specific */
+    #reviewPage select.input-box {
+        width: 90% !important;
+        max-width: 300px;
+    }
+    
+    #reviewPage textarea.input-box {
+        width: 90% !important;
+        max-width: 300px;
+    }
+    
+    /* Hostel form extras checkboxes */
+    #hostelFormPage div[style*="width:260px"] {
+        width: 90% !important;
+        max-width: 300px;
+        margin: 8px auto;
+    }
+    
+    /* Adjust container widths */
+    #statusContainer,
+    #adminRequestsContainer,
+    #adminReviewsContainer {
+        width: 95% !important;
+        max-width: 100% !important;
+    }
+    
+    /* Make delete buttons more visible */
+    .danger-btn {
+        font-size: 14px;
+        padding: 12px 16px;
+    }
+    
+    /* Welcome page optimization */
+    #welcomePage::after {
+        background-attachment: scroll;
+        filter: blur(1px);
+    }
+}
+
+/* Extra small devices (phones, 480px and down) */
+@media screen and (max-width: 480px) {
+    h1 {
+        font-size: 24px !important;
+        line-height: 1.2;
+    }
+    
+    #welcomePage h1 {
+        font-size: 26px !important;
+    }
+    
+    .input-box {
+        font-size: 15px;
+        padding: 10px;
+    }
+    
+    .btn, .neon-btn, .back-btn {
+        font-size: 15px;
+        padding: 12px 16px;
+    }
+    
+    .request-detail-label {
+        font-size: 12px;
+    }
+    
+    .request-detail-value {
+        font-size: 13px;
+    }
+    
+    .priority-badge {
+        font-size: 10px;
+        padding: 2px 6px;
+    }
+    
+    .request-status {
+        font-size: 12px;
+        padding: 3px 8px;
+    }
+    
+    /* Adjust table for very small screens */
+    table {
+        font-size: 11px;
+    }
+    
+    table th,
+    table td {
+        padding: 4px 2px;
+    }
+    
+    /* Stack action buttons vertically */
+    .request-actions {
+        flex-direction: column;
+    }
+}
+
+/* Tablet devices (768px to 1024px) */
+@media screen and (min-width: 769px) and (max-width: 1024px) {
+    .page {
+        padding: 20px;
+    }
+    
+    .input-box {
+        width: 80%;
+        max-width: 400px;
+    }
+    
+    .horizontal-btns {
+        flex-wrap: wrap;
+        gap: 15px;
+    }
+    
+    .request-details {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+/* Ensure student table page is properly styled */
+#adminStudentDetails {
+  padding-bottom: 30px;
+}
+
+#adminStudentDetails table {
+  overflow-x: auto;
+  display: block;
+}
 </style>
 </head>
 <body>
@@ -401,93 +684,15 @@ h1 {
 </div>
 
 <div id="studentRegisterPage" class="page">
- async function registerStudent() {
-    let name = document.getElementById('regName').value.trim();
-    let roll = document.getElementById('regRoll').value.trim();
-    let email = document.getElementById('regEmail').value.trim();
-    let course = document.getElementById('regCourse').value.trim();
-    let pass = document.getElementById('regPass').value.trim();
-
-    // SIMPLE VALIDATION CHECKS
-    if (!name || !roll || !email || !course || !pass) {
-        alert("Please fill all fields!");
-        return;
-    }
-
-    // Name validation - only letters and spaces
-    if (!/^[A-Za-z\s]+$/.test(name)) {
-        alert("Name can only contain letters and spaces!");
-        return;
-    }
-
-    // Roll number validation - alphanumeric only
-    if (!/^[A-Za-z0-9]+$/.test(roll)) {
-        alert("Roll number can only contain letters and numbers!");
-        return;
-    }
-
-    // Email validation - basic format check
-    if (!/^\S+@\S+\.\S+$/.test(email)) {
-        alert("Please enter a valid email (example@domain.com)!");
-        return;
-    }
-
-    // Password length check
-    if (pass.length < 6) {
-        alert("Password must be at least 6 characters!");
-        return;
-    }
-
-    // Show loading state
-    const registerBtn = document.getElementById('registerBtn');
-    registerBtn.innerHTML = '<span class="loading"></span> Registering...';
-    registerBtn.disabled = true;
-
-    try {
-        // Firebase check
-        const snapshot = await db.collection('students')
-            .where('roll', '==', roll)
-            .get();
-        
-        if (!snapshot.empty) {
-            alert("Roll number already exists!");
-            return;
-        }
-        
-        // Also check if email already exists
-        const emailSnapshot = await db.collection('students')
-            .where('email', '==', email)
-            .get();
-        
-        if (!emailSnapshot.empty) {
-            alert("Email already registered!");
-            return;
-        }
-
-        // Save to Firebase
-        await db.collection('students').add({
-            name, roll, email, course, password: pass,
-            createdAt: new Date()
-        });
-
-        // Also save to localStorage for backward compatibility
-        const students = JSON.parse(localStorage.getItem('students'));
-        const newStudent = { name, roll, email, course, pass };
-        students.push(newStudent);
-        localStorage.setItem('students', JSON.stringify(students));
-        
-        alert("Registration successful!");
-        clearRegistrationForm();
-        showPage("mainLoginPage");
-    } catch (error) {
-        console.error("Error registering student:", error);
-        alert("Registration failed. Please try again.");
-    } finally {
-        // Reset button state
-        registerBtn.innerHTML = 'Register';
-        registerBtn.disabled = false;
-    }
-}
+  <h1>Student Registration</h1>
+  <input type="text" id="regName" class="input-box" placeholder="Enter Name">
+  <input type="text" id="regRoll" class="input-box" placeholder="Enter Roll No">
+  <input type="email" id="regEmail" class="input-box" placeholder="Enter Email-ID">
+  <input type="text" id="regCourse" class="input-box" placeholder="Enter Course">
+  <input type="password" id="regPass" class="input-box" placeholder="Set Password">
+  <button class="btn" onclick="registerStudent()" id="registerBtn">Register</button>
+  <button class="back-btn" onclick="clearRegistrationForm(); showPage('mainLoginPage')">↩</button>
+</div>
 
 <div id="studentDashboardPage" class="page">
   <h1>Welcome Student</h1>
@@ -813,7 +1018,7 @@ function showPage(pageId) {
     document.getElementById(pageId).style.display = "flex";
 }
 
-// Registration function - UPDATED WITH FIREBASE
+// Registration function - UPDATED WITH FIREBASE AND VALIDATION
 async function registerStudent() {
     let name = document.getElementById('regName').value.trim();
     let roll = document.getElementById('regRoll').value.trim();
@@ -823,6 +1028,31 @@ async function registerStudent() {
 
     if (!name || !roll || !email || !course || !pass) {
         alert("Please fill all fields!");
+        return;
+    }
+
+    // VALIDATION CHECKS - ADDED AS REQUESTED
+    // Name validation - only letters and spaces
+    if (!/^[A-Za-z\s]+$/.test(name)) {
+        alert("Name can only contain letters and spaces!");
+        return;
+    }
+
+    // Roll number validation - alphanumeric only
+    if (!/^[A-Za-z0-9]+$/.test(roll)) {
+        alert("Roll number can only contain letters and numbers!");
+        return;
+    }
+
+    // Email validation - basic format check
+    if (!/^\S+@\S+\.\S+$/.test(email)) {
+        alert("Please enter a valid email (example@domain.com)!");
+        return;
+    }
+
+    // Password length check
+    if (pass.length < 6) {
+        alert("Password must be at least 6 characters!");
         return;
     }
 
@@ -1590,4 +1820,3 @@ document.addEventListener('DOMContentLoaded', function() {
 </script>
 </body>
 </html>
-
