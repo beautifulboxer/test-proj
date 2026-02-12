@@ -1,10 +1,9 @@
-<!DOCTYPE html>
+\<!DOCTYPE html>
 <html lang="en">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <head>
 <meta charset="UTF-8">
 <title>Hostel Management System</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 
 <!-- Firebase SDK -->
 <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
@@ -719,7 +718,7 @@ table {
     <button class="btn" onclick="chooseACType('Hostel 1 AC')">Hostel 1 (AC) – ₹30,000</button>
     <button class="btn" onclick="chooseACType('Hostel 2 Non-AC')">Hostel 2 (Non-AC) – ₹20,000</button>
   </div>
-  <button class="back-btn" onclick="showPage('hostelCategoryPage')">↩</button>
+  <button class="back-btn" onclick="clearHostelForm(); showPage('hostelCategoryPage')">↩ Back</button>
 </div>
 
 <div id="hostelFormPage" class="page">
@@ -756,7 +755,7 @@ table {
 
   <div style="display:flex; gap:10px; margin-top:12px;">
     <button class="btn" onclick="calculateHostelFees()">Calculate & Preview</button>
-    <button class="back-btn" onclick="showPage('hostelACPage')">↩ Back</button>
+    <button class="back-btn" onclick="clearHostelForm(); showPage('hostelACPage')">↩ Back</button>
   </div>
 
   <div style="margin-top:12px; display:flex; gap:10px;">
@@ -908,8 +907,28 @@ const firebaseConfig = {
 };
 
 // Initialize Firebase
-firebase.initializeApp(firebaseConfig);
-const db = firebase.firestore();
+let db;
+try {
+    firebase.initializeApp(firebaseConfig);
+    db = firebase.firestore();
+    console.log("Firebase initialized successfully");
+} catch (error) {
+    console.error("Firebase initialization error:", error);
+    // Create a mock db object to prevent errors
+    db = {
+        collection: () => ({
+            add: async () => { throw new Error("Firebase not available"); },
+            get: async () => ({ empty: true, docs: [] }),
+            doc: () => ({
+                update: async () => {},
+                delete: async () => {}
+            }),
+            where: () => ({
+                get: async () => ({ empty: true, docs: [] })
+            })
+        })
+    };
+}
 
 // Global variables
 let selectedCategory = ""; 
@@ -927,6 +946,19 @@ function initializeData() {
     if (!localStorage.getItem('reviews')) {
         localStorage.setItem('reviews', JSON.stringify([]));
     }
+}
+
+// Helper functions for localStorage with null checks
+function getStudents() {
+    return JSON.parse(localStorage.getItem('students') || '[]');
+}
+
+function getApplications() {
+    return JSON.parse(localStorage.getItem('applications') || '[]');
+}
+
+function getReviews() {
+    return JSON.parse(localStorage.getItem('reviews') || '[]');
 }
 
 // Form clearing functions
@@ -972,7 +1004,7 @@ function clearAllRequests() {
             snapshot.docs.forEach(doc => {
                 db.collection('applications').doc(doc.id).delete();
             });
-        });
+        }).catch(error => console.error("Error clearing Firebase requests:", error));
         alert("All requests deleted successfully!");
         viewAllRequests(); // Refresh the page
     }
@@ -986,7 +1018,7 @@ function clearAllReviews() {
             snapshot.docs.forEach(doc => {
                 db.collection('reviews').doc(doc.id).delete();
             });
-        });
+        }).catch(error => console.error("Error clearing Firebase reviews:", error));
         alert("All reviews deleted successfully!");
         viewAllReviews(); // Refresh the page
     }
@@ -1001,12 +1033,12 @@ function clearAllStudents() {
             snapshot.docs.forEach(doc => {
                 db.collection('students').doc(doc.id).delete();
             });
-        });
+        }).catch(error => console.error("Error clearing Firebase students:", error));
         db.collection('applications').get().then(snapshot => {
             snapshot.docs.forEach(doc => {
                 db.collection('applications').doc(doc.id).delete();
             });
-        });
+        }).catch(error => console.error("Error clearing Firebase applications:", error));
         alert("All students and their applications deleted successfully!");
         loadStudents(); // Refresh the page
     }
@@ -1069,6 +1101,8 @@ async function registerStudent() {
         
         if (!snapshot.empty) {
             alert("Roll number already exists!");
+            registerBtn.innerHTML = 'Register';
+            registerBtn.disabled = false;
             return;
         }
         
@@ -1079,7 +1113,7 @@ async function registerStudent() {
         });
 
         // Also save to localStorage for backward compatibility
-        const students = JSON.parse(localStorage.getItem('students'));
+        const students = getStudents();
         const newStudent = { name, roll, email, course, pass };
         students.push(newStudent);
         localStorage.setItem('students', JSON.stringify(students));
@@ -1128,7 +1162,7 @@ async function unifiedLogin() {
             showPage("studentDashboardPage");
         } else {
             // Fallback to localStorage for backward compatibility
-            const students = JSON.parse(localStorage.getItem('students'));
+            const students = getStudents();
             const student = students.find(s => s.roll === username && s.pass === password);
             
             if (student) {
@@ -1230,8 +1264,8 @@ async function submitHostelApplication() {
     }
 
     // Also check localStorage
-    const applications = JSON.parse(localStorage.getItem('applications'));
-    const existingApp = applications.find(app => app.roll === student.roll);
+    const applications = getApplications();
+    const existingApp = applications ? applications.find(app => app && app.roll === student.roll) : null;
     if (existingApp) {
         alert("You have already submitted a hostel application! Please wait for admin to process it or delete it before submitting a new one.");
         return;
@@ -1344,8 +1378,8 @@ async function checkApplicationStatus() {
             `;
         } else {
             // Fallback to localStorage
-            const applications = JSON.parse(localStorage.getItem('applications'));
-            const app = applications.find(a => a.roll === student.roll);
+            const applications = getApplications();
+            const app = applications ? applications.find(a => a && a.roll === student.roll) : null;
             
             if (!app) {
                 container.innerHTML = "<p>No applications submitted yet.</p>";
@@ -1439,7 +1473,7 @@ async function submitReview() {
         await db.collection('reviews').add(newReview);
         
         // Also save to localStorage for backward compatibility
-        const reviews = JSON.parse(localStorage.getItem('reviews'));
+        const reviews = getReviews();
         reviews.push(newReview);
         localStorage.setItem('reviews', JSON.stringify(reviews));
         
@@ -1524,7 +1558,7 @@ async function viewAllRequests() {
     } catch (error) {
         console.error("Error loading requests:", error);
         // Fallback to localStorage
-        const applications = JSON.parse(localStorage.getItem('applications'));
+        const applications = getApplications();
         
         // Sort by date for first-come-first-served priority
         applications.sort((a, b) => new Date(a.date) - new Date(b.date));
@@ -1575,8 +1609,8 @@ async function viewAllRequests() {
                         </div>
                     </div>
                     <div class="request-actions">
-                        <button onclick="updateStatus('${a.roll}','Approved')" class="btn">Approve</button>
-                        <button onclick="updateStatus('${a.roll}','Rejected')" class="btn">Reject</button>
+                        <button onclick="updateStatus('${a.id || ''}','${a.roll}','Approved')" class="btn">Approve</button>
+                        <button onclick="updateStatus('${a.id || ''}','${a.roll}','Rejected')" class="btn">Reject</button>
                     </div>
                 </div>
             `).join("");
@@ -1593,7 +1627,7 @@ async function updateStatus(id, roll, status) {
         }
         
         // Also update in localStorage for backward compatibility
-        const applications = JSON.parse(localStorage.getItem('applications'));
+        const applications = getApplications();
         const appIndex = applications.findIndex(app => app.roll === roll);
         
         if (appIndex !== -1) {
@@ -1638,7 +1672,7 @@ async function viewAllReviews() {
     } catch (error) {
         console.error("Error loading reviews:", error);
         // Fallback to localStorage
-        const reviews = JSON.parse(localStorage.getItem('reviews'));
+        const reviews = getReviews();
         
         if (reviews.length === 0) {
             container.innerHTML = "<p>No reviews yet.</p>";
@@ -1662,42 +1696,60 @@ async function viewAllReviews() {
     showPage("adminReviewsPage");
 }
 
-// NEW: Search Students Function
-function searchStudents() {
+// Search Students Function with Firebase support
+async function searchStudents() {
     const search = document.getElementById('searchStudent').value.toLowerCase();
-    filterStudents(search);
+    
+    try {
+        // Get data from Firebase
+        const studentsSnapshot = await db.collection('students').get();
+        const students = studentsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        
+        const applicationsSnapshot = await db.collection('applications').get();
+        const applications = applicationsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        
+        filterStudents(search, students, applications);
+    } catch (error) {
+        console.error("Error searching students:", error);
+        // Fallback to localStorage
+        const students = getStudents();
+        const applications = getApplications();
+        filterStudents(search, students, applications);
+    }
 }
 
-// UPDATED: Filter Students Function
-function filterStudents(searchTerm = '') {
-    const students = JSON.parse(localStorage.getItem('students'));
-    const applications = JSON.parse(localStorage.getItem('applications'));
-    
-    // If no search term provided, show all students
-    const filtered = searchTerm ? students.filter(s => 
-        s.name.toLowerCase().includes(searchTerm) || 
-        s.roll.toLowerCase().includes(searchTerm) ||
-        s.email.toLowerCase().includes(searchTerm) ||
-        s.course.toLowerCase().includes(searchTerm)
-    ) : students;
-    
+// Filter Students Function
+function filterStudents(searchTerm = '', students = [], applications = []) {
     const tbody = document.getElementById('studentTableBody');
+    
+    // If no students array provided, try to get from localStorage
+    if (students.length === 0) {
+        students = getStudents();
+        applications = getApplications();
+    }
+    
+    // Filter based on search term
+    const filtered = searchTerm ? students.filter(s => 
+        (s.name && s.name.toLowerCase().includes(searchTerm)) || 
+        (s.roll && s.roll.toLowerCase().includes(searchTerm)) ||
+        (s.email && s.email.toLowerCase().includes(searchTerm)) ||
+        (s.course && s.course.toLowerCase().includes(searchTerm))
+    ) : students;
     
     if (filtered.length === 0) {
         tbody.innerHTML = "<tr><td colspan='5'>No matching students found.</td></tr>";
     } else {
         tbody.innerHTML = filtered.map(s => {
-            const studentApp = applications.find(app => app.roll === s.roll);
+            const studentApp = applications.find(app => app && app.roll === s.roll);
             
-            // IMPROVED: Show amenities properly
             let amenities = 'No application submitted';
             if (studentApp) {
                 amenities = `
                     <div class="amenities-list">
-                        <strong>Hostel:</strong> ${studentApp.hostel}<br>
-                        <strong>Washroom:</strong> ${studentApp.washroom}<br>
-                        <strong>Occupancy:</strong> ${studentApp.occupancy}<br>
-                        <strong>Mess:</strong> ${studentApp.mess}<br>
+                        <strong>Hostel:</strong> ${studentApp.hostel || 'N/A'}<br>
+                        <strong>Washroom:</strong> ${studentApp.washroom || 'N/A'}<br>
+                        <strong>Occupancy:</strong> ${studentApp.occupancy || 'N/A'}<br>
+                        <strong>Mess:</strong> ${studentApp.mess || 'N/A'}<br>
                         <strong>Extras:</strong> ${[
                             studentApp.gym && 'Gym', 
                             studentApp.library && 'Library', 
@@ -1709,10 +1761,10 @@ function filterStudents(searchTerm = '') {
             
             return `
                 <tr>
-                    <td>${s.name}</td>
-                    <td>${s.roll}</td>
-                    <td>${s.email}</td>
-                    <td>${s.course}</td>
+                    <td>${s.name || ''}</td>
+                    <td>${s.roll || ''}</td>
+                    <td>${s.email || ''}</td>
+                    <td>${s.course || ''}</td>
                     <td style="text-align: left;">${amenities}</td>
                 </tr>
             `;
@@ -1736,17 +1788,16 @@ async function loadStudents() {
             tbody.innerHTML = "<tr><td colspan='5'>No students registered yet.</td></tr>";
         } else {
             tbody.innerHTML = students.map(s => {
-                const studentApp = applications.find(app => app.roll === s.roll);
+                const studentApp = applications.find(app => app && app.roll === s.roll);
                 
-                // IMPROVED: Show amenities properly
                 let amenities = 'No application submitted';
                 if (studentApp) {
                     amenities = `
                         <div class="amenities-list">
-                            <strong>Hostel:</strong> ${studentApp.hostel}<br>
-                            <strong>Washroom:</strong> ${studentApp.washroom}<br>
-                            <strong>Occupancy:</strong> ${studentApp.occupancy}<br>
-                            <strong>Mess:</strong> ${studentApp.mess}<br>
+                            <strong>Hostel:</strong> ${studentApp.hostel || 'N/A'}<br>
+                            <strong>Washroom:</strong> ${studentApp.washroom || 'N/A'}<br>
+                            <strong>Occupancy:</strong> ${studentApp.occupancy || 'N/A'}<br>
+                            <strong>Mess:</strong> ${studentApp.mess || 'N/A'}<br>
                             <strong>Extras:</strong> ${[
                                 studentApp.gym && 'Gym', 
                                 studentApp.library && 'Library', 
@@ -1758,10 +1809,10 @@ async function loadStudents() {
                 
                 return `
                     <tr>
-                        <td>${s.name}</td>
-                        <td>${s.roll}</td>
-                        <td>${s.email}</td>
-                        <td>${s.course}</td>
+                        <td>${s.name || ''}</td>
+                        <td>${s.roll || ''}</td>
+                        <td>${s.email || ''}</td>
+                        <td>${s.course || ''}</td>
                         <td style="text-align: left;">${amenities}</td>
                     </tr>
                 `;
@@ -1770,24 +1821,23 @@ async function loadStudents() {
     } catch (error) {
         console.error("Error loading students:", error);
         // Fallback to localStorage
-        const students = JSON.parse(localStorage.getItem('students'));
-        const applications = JSON.parse(localStorage.getItem('applications'));
+        const students = getStudents();
+        const applications = getApplications();
         
         if (students.length === 0) {
             tbody.innerHTML = "<tr><td colspan='5'>No students registered yet.</td></tr>";
         } else {
             tbody.innerHTML = students.map(s => {
-                const studentApp = applications.find(app => app.roll === s.roll);
+                const studentApp = applications.find(app => app && app.roll === s.roll);
                 
-                // IMPROVED: Show amenities properly
                 let amenities = 'No application submitted';
                 if (studentApp) {
                     amenities = `
                         <div class="amenities-list">
-                            <strong>Hostel:</strong> ${studentApp.hostel}<br>
-                            <strong>Washroom:</strong> ${studentApp.washroom}<br>
-                            <strong>Occupancy:</strong> ${studentApp.occupancy}<br>
-                            <strong>Mess:</strong> ${studentApp.mess}<br>
+                            <strong>Hostel:</strong> ${studentApp.hostel || 'N/A'}<br>
+                            <strong>Washroom:</strong> ${studentApp.washroom || 'N/A'}<br>
+                            <strong>Occupancy:</strong> ${studentApp.occupancy || 'N/A'}<br>
+                            <strong>Mess:</strong> ${studentApp.mess || 'N/A'}<br>
                             <strong>Extras:</strong> ${[
                                 studentApp.gym && 'Gym', 
                                 studentApp.library && 'Library', 
@@ -1799,10 +1849,10 @@ async function loadStudents() {
                 
                 return `
                     <tr>
-                        <td>${s.name}</td>
-                        <td>${s.roll}</td>
-                        <td>${s.email}</td>
-                        <td>${s.course}</td>
+                        <td>${s.name || ''}</td>
+                        <td>${s.roll || ''}</td>
+                        <td>${s.email || ''}</td>
+                        <td>${s.course || ''}</td>
                         <td style="text-align: left;">${amenities}</td>
                     </tr>
                 `;
